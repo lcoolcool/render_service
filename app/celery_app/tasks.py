@@ -1,5 +1,6 @@
 """Celery异步任务定义"""
 import asyncio
+import logging
 import time
 import threading
 from pathlib import Path
@@ -7,6 +8,8 @@ from celery import Task
 from celery.exceptions import Ignore
 from app.celery_app.celery import celery_app
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class DatabaseTask(Task):
@@ -36,8 +39,6 @@ class DatabaseTask(Task):
     bind=True,
     base=DatabaseTask,
     name="app.celery_app.tasks.render_task",
-    autoretry_for=(Exception,),
-    retry_kwargs={"max_retries": 3, "countdown": 60},  # 60秒后重试
     acks_late=True
 )
 def render_task(self, task_id: int):
@@ -176,7 +177,6 @@ def render_task(self, task_id: int):
 
         # 清理工作空间
         if task.workspace_dir:
-            from pathlib import Path
             file_prep_service.cleanup_workspace(Path(task.workspace_dir))
 
     except Ignore:
@@ -185,42 +185,35 @@ def render_task(self, task_id: int):
         loop.run_until_complete(task.save())
 
         if task.workspace_dir:
-            from pathlib import Path
             try:
                 file_prep_service.cleanup_workspace(Path(task.workspace_dir))
-            except:
-                pass  # 清理失败不影响任务取消
+            except Exception as cleanup_error:
+                # 记录清理错误但不影响任务取消
+                logger.warning(f"清理工作空间失败: {cleanup_error}")
         raise
 
     except Exception as e:
-        # 任务失败
+        # 任务失败，清理工作空间
         task.status = TaskStatus.FAILED
         task.error_message = str(e)
-        task.retry_count += 1
         loop.run_until_complete(task.save())
 
-        # 如果没有重试次数了，清理工作空间
-        if task.retry_count >= task.max_retries:
-            if task.workspace_dir:
-                from pathlib import Path
-                try:
-                    file_prep_service.cleanup_workspace(Path(task.workspace_dir))
-                except:
-                    pass  # 清理失败不影响任务
+        # 清理工作空间
+        if task.workspace_dir:
+            try:
+                file_prep_service.cleanup_workspace(Path(task.workspace_dir))
+            except Exception as cleanup_error:
+                # 记录清理错误但不影响任务失败状态
+                logger.warning(f"清理工作空间失败: {cleanup_error}")
 
-        # 如果还有重试次数，抛出异常触发重试
-        if task.retry_count < task.max_retries:
-            raise
-        else:
-            raise Ignore()
+        # 重新抛出原始异常，让Celery记录错误
+        raise
 
 
 @celery_app.task(
     bind=True,
     base=DatabaseTask,
-    name="app.celery_app.tasks.generate_thumbnail",
-    autoretry_for=(Exception,),
-    retry_kwargs={"max_retries": 2, "countdown": 30}
+    name="app.celery_app.tasks.generate_thumbnail"
 )
 def generate_thumbnail(self, frame_id: int):
     """
