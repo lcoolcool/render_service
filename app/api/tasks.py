@@ -59,10 +59,10 @@ async def create_task(task_data: TaskCreate):
             queue_name = "default"
 
         # 提交异步任务
+        # 注意：优先级通过队列区分，不需要传递priority参数
         celery_task = render_task.apply_async(
             args=[task.id],
-            queue=queue_name,
-            priority=task_data.priority
+            queue=queue_name
         )
 
         # 更新celery_task_id

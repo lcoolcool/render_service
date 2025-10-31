@@ -1,6 +1,7 @@
 """Celery异步任务定义"""
 import asyncio
 import time
+import threading
 from pathlib import Path
 from celery import Task
 from celery.exceptions import Ignore
@@ -11,19 +12,24 @@ from app.config import settings
 class DatabaseTask(Task):
     """支持数据库操作的任务基类"""
     _db_initialized = False
+    _init_lock = threading.Lock()  # 线程锁，确保数据库初始化的线程安全
 
     def before_start(self, task_id, args, kwargs):
         """任务开始前初始化数据库连接"""
+        # 使用双重检查锁定模式（Double-Checked Locking）
         if not self._db_initialized:
-            from tortoise import Tortoise
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(
-                Tortoise.init(
-                    db_url=settings.database_url,
-                    modules={"models": ["app.models.task", "app.models.frame"]}
-                )
-            )
-            self._db_initialized = True
+            with self._init_lock:
+                # 再次检查，避免重复初始化
+                if not self._db_initialized:
+                    from tortoise import Tortoise
+                    loop = asyncio.get_event_loop()
+                    loop.run_until_complete(
+                        Tortoise.init(
+                            db_url=settings.database_url,
+                            modules={"models": ["app.models.task", "app.models.frame"]}
+                        )
+                    )
+                    self._db_initialized = True
 
 
 @celery_app.task(
@@ -62,11 +68,12 @@ def render_task(self, task_id: int):
     task.celery_task_id = self.request.id
     loop.run_until_complete(task.save())
 
+    # 初始化文件准备服务（在try块外部，确保在所有分支中都可用）
+    from app.services.file_preparation import FilePreparationService
+    file_prep_service = FilePreparationService()
+
     try:
         # 1. 准备工程文件（从OSS下载并解压）
-        from app.services.file_preparation import FilePreparationService
-
-        file_prep_service = FilePreparationService()
 
         try:
             project_file, workspace_dir = file_prep_service.prepare_project_files(

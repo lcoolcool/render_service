@@ -17,7 +17,7 @@ class RenderFrame(Model):
 
     id = fields.IntField(pk=True)
     # 关联的任务
-    task = fields.ForeignKeyField("models.RenderTask", related_name="frames", on_delete=fields.CASCADE, db_constraint=False)
+    task = fields.ForeignKeyField("models.RenderTask", related_name="frames", on_delete=fields.CASCADE)
     # 帧序号
     frame_number = fields.IntField()
     # 帧状态

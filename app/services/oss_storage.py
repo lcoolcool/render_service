@@ -13,8 +13,19 @@ class OSSStorageService:
 
     def __init__(self):
         """初始化OSS客户端"""
+        # 验证OSS配置的完整性和有效性
         if not settings.oss_access_key_id or not settings.oss_access_key_secret:
             raise ValueError("OSS配置不完整，请检查 .env 文件中的 OSS_ACCESS_KEY_ID 和 OSS_ACCESS_KEY_SECRET")
+
+        # 检查是否使用了默认占位符值
+        if settings.oss_access_key_id == "your_access_key_id":
+            raise ValueError("OSS_ACCESS_KEY_ID 使用了默认占位符值，请在 .env 文件中配置正确的AccessKey ID")
+
+        if settings.oss_access_key_secret == "your_access_key_secret":
+            raise ValueError("OSS_ACCESS_KEY_SECRET 使用了默认占位符值，请在 .env 文件中配置正确的AccessKey Secret")
+
+        if settings.oss_bucket_name == "your_bucket_name":
+            raise ValueError("OSS_BUCKET_NAME 使用了默认占位符值，请在 .env 文件中配置正确的Bucket名称")
 
         # 创建认证对象
         self.auth = oss2.Auth(
