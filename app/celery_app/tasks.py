@@ -85,7 +85,7 @@ def render_task(self, task_id: int):
             try:
                 # 执行渲染
                 start_time = time.time()
-                output_path = renderer.render_frame(
+                output_path, stdout, stderr = renderer.render_frame(
                     project_file=task.project_file,
                     frame_number=frame.frame_number,
                     output_dir=settings.render_output_dir,
@@ -97,6 +97,8 @@ def render_task(self, task_id: int):
                 frame.status = FrameStatus.COMPLETED
                 frame.output_path = str(output_path)
                 frame.render_time = render_time
+                frame.stdout = stdout
+                frame.stderr = stderr
                 loop.run_until_complete(frame.save())
 
                 # 异步生成缩略图
@@ -110,6 +112,8 @@ def render_task(self, task_id: int):
                 # 帧渲染失败
                 frame.status = FrameStatus.FAILED
                 frame.error_message = str(e)
+                # 尝试保存渲染日志（如果有的话）
+                # 注意：异常时可能没有日志，但也可能是在后续步骤失败
                 loop.run_until_complete(frame.save())
 
                 # 记录错误但继续渲染其他帧

@@ -23,7 +23,7 @@ class BaseRenderer(ABC):
         frame_number: int,
         output_dir: Path,
         engine_conf: Optional[dict] = None
-    ) -> Path:
+    ) -> tuple[Path, str, str]:
         """
         渲染单帧
 
@@ -34,7 +34,7 @@ class BaseRenderer(ABC):
             engine_conf: 引擎配置字典
 
         Returns:
-            渲染结果文件路径
+            (渲染结果文件路径, stdout日志, stderr日志)
         """
         pass
 
@@ -82,7 +82,7 @@ class MayaRenderer(BaseRenderer):
         frame_number: int,
         output_dir: Path,
         engine_conf: Optional[dict] = None
-    ) -> Path:
+    ) -> tuple[Path, str, str]:
         """使用Maya批处理模式渲染单帧"""
 
         # 确保输出目录存在
@@ -115,7 +115,7 @@ class MayaRenderer(BaseRenderer):
         if not output_file or not output_file.exists():
             raise RuntimeError(f"未找到渲染输出文件，帧号: {frame_number}")
 
-        return output_file
+        return output_file, stdout, stderr
 
     def _find_output_file(self, output_dir: Path, frame_number: int, stdout: str) -> Optional[Path]:
         """从Maya输出中查找渲染结果文件"""
@@ -154,7 +154,7 @@ class UERenderer(BaseRenderer):
         frame_number: int,
         output_dir: Path,
         engine_conf: Optional[dict] = None
-    ) -> Path:
+    ) -> tuple[Path, str, str]:
         """使用UE命令行模式渲染单帧"""
 
         # 确保输出目录存在
@@ -202,7 +202,7 @@ class UERenderer(BaseRenderer):
         if not output_file or not output_file.exists():
             raise RuntimeError(f"未找到UE渲染输出文件，帧号: {frame_number}")
 
-        return output_file
+        return output_file, stdout, stderr
 
     def _find_output_file(self, output_dir: Path, frame_number: int) -> Optional[Path]:
         """查找UE渲染输出文件"""
