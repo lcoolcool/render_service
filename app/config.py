@@ -23,6 +23,13 @@ class Settings(BaseSettings):
     render_output_dir: Path = Path("C:/Project/test/render")
     thumbnail_dir: Path = Path("C:/render_outputs/thumbnails")
     upload_dir: Path = Path("C:/uploads")
+    workspace_root_dir: Path = Path("C:/workspace")  # 任务工作空间根目录
+
+    # 阿里云OSS配置
+    oss_endpoint: str = "oss-cn-hangzhou.aliyuncs.com"  # OSS访问域名
+    oss_access_key_id: str = "your_access_key_id"  # AccessKey ID
+    oss_access_key_secret: str = "your_access_key_secret"  # AccessKey Secret
+    oss_bucket_name: str = "your_bucket_name"  # Bucket名称
 
     # 渲染引擎配置
     maya_executable: Path = Path("C:/Program Files/Autodesk/Maya2022/bin/Render.exe")
@@ -49,6 +56,7 @@ class Settings(BaseSettings):
         self.render_output_dir.mkdir(parents=True, exist_ok=True)
         self.thumbnail_dir.mkdir(parents=True, exist_ok=True)
         self.upload_dir.mkdir(parents=True, exist_ok=True)
+        self.workspace_root_dir.mkdir(parents=True, exist_ok=True)
 
 
 # 全局配置实例

@@ -16,8 +16,11 @@ async def create_task(task_data: TaskCreate):
     """
     创建新的渲染任务
 
-    - **project_file**: 工程文件路径
+    - **unionid**: 用户ID
+    - **oss_file_path**: OSS上的工程文件路径
+    - **is_compressed**: 文件是否为压缩格式
     - **render_engine**: 渲染引擎（maya/ue）
+    - **render_engine_conf**: 渲染引擎配置
     - **priority**: 任务优先级（0-10）
     - **total_frames**: 总帧数
     - **max_retries**: 最大重试次数
@@ -26,7 +29,8 @@ async def create_task(task_data: TaskCreate):
         # 创建任务记录
         task = await RenderTask.create(
             unionid=task_data.unionid,
-            project_file=task_data.project_file,
+            oss_file_path=task_data.oss_file_path,
+            is_compressed=task_data.is_compressed,
             render_engine=task_data.render_engine,
             render_engine_conf=task_data.render_engine_conf,
             priority=task_data.priority,
@@ -69,7 +73,10 @@ async def create_task(task_data: TaskCreate):
         return TaskResponse(
             id=task.id,
             unionid=task.unionid,
+            oss_file_path=task.oss_file_path,
+            is_compressed=task.is_compressed,
             project_file=task.project_file,
+            workspace_dir=task.workspace_dir,
             render_engine=task.render_engine.value,
             render_engine_conf=task.render_engine_conf,
             status=task.status.value,
@@ -100,7 +107,10 @@ async def get_task(task_id: int):
     return TaskResponse(
         id=task.id,
         unionid=task.unionid,
+        oss_file_path=task.oss_file_path,
+        is_compressed=task.is_compressed,
         project_file=task.project_file,
+        workspace_dir=task.workspace_dir,
         render_engine=task.render_engine.value,
         render_engine_conf=task.render_engine_conf,
         status=task.status.value,
@@ -163,7 +173,10 @@ async def list_tasks(
         TaskResponse(
             id=task.id,
             unionid=task.unionid,
+            oss_file_path=task.oss_file_path,
+            is_compressed=task.is_compressed,
             project_file=task.project_file,
+            workspace_dir=task.workspace_dir,
             render_engine=task.render_engine.value,
             render_engine_conf=task.render_engine_conf,
             status=task.status.value,

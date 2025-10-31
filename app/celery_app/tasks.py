@@ -63,10 +63,36 @@ def render_task(self, task_id: int):
     loop.run_until_complete(task.save())
 
     try:
-        # 获取渲染引擎
+        # 1. 准备工程文件（从OSS下载并解压）
+        from app.services.file_preparation import FilePreparationService
+
+        file_prep_service = FilePreparationService()
+
+        try:
+            project_file, workspace_dir = file_prep_service.prepare_project_files(
+                unionid=task.unionid,
+                task_id=task.id,
+                oss_file_path=task.oss_file_path,
+                is_compressed=task.is_compressed,
+                render_engine=task.render_engine
+            )
+
+            # 更新任务的本地文件路径和工作空间
+            task.project_file = str(project_file)
+            task.workspace_dir = str(workspace_dir)
+            loop.run_until_complete(task.save())
+
+        except Exception as e:
+            # 文件准备失败
+            task.status = TaskStatus.FAILED
+            task.error_message = f"文件准备失败: {str(e)}"
+            loop.run_until_complete(task.save())
+            raise Ignore()
+
+        # 2. 获取渲染引擎
         renderer = get_renderer(task.render_engine)
 
-        # 获取所有待渲染的帧
+        # 3. 获取所有待渲染的帧
         frames = loop.run_until_complete(
             RenderFrame.filter(task_id=task_id, status=FrameStatus.PENDING).all()
         )
@@ -141,10 +167,22 @@ def render_task(self, task_id: int):
 
         loop.run_until_complete(task.save())
 
+        # 清理工作空间
+        if task.workspace_dir:
+            from pathlib import Path
+            file_prep_service.cleanup_workspace(Path(task.workspace_dir))
+
     except Ignore:
-        # 任务被取消
+        # 任务被取消，清理工作空间
         task.status = TaskStatus.CANCELLED
         loop.run_until_complete(task.save())
+
+        if task.workspace_dir:
+            from pathlib import Path
+            try:
+                file_prep_service.cleanup_workspace(Path(task.workspace_dir))
+            except:
+                pass  # 清理失败不影响任务取消
         raise
 
     except Exception as e:
@@ -153,6 +191,15 @@ def render_task(self, task_id: int):
         task.error_message = str(e)
         task.retry_count += 1
         loop.run_until_complete(task.save())
+
+        # 如果没有重试次数了，清理工作空间
+        if task.retry_count >= task.max_retries:
+            if task.workspace_dir:
+                from pathlib import Path
+                try:
+                    file_prep_service.cleanup_workspace(Path(task.workspace_dir))
+                except:
+                    pass  # 清理失败不影响任务
 
         # 如果还有重试次数，抛出异常触发重试
         if task.retry_count < task.max_retries:

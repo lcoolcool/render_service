@@ -8,7 +8,8 @@ from app.models.task import TaskStatus, RenderEngine
 class TaskCreate(BaseModel):
     """创建任务的请求模型"""
     unionid: str = Field(..., description="用户ID")
-    project_file: str = Field(..., description="工程文件路径")
+    oss_file_path: str = Field(..., description="OSS上的工程文件路径")
+    is_compressed: bool = Field(default=False, description="文件是否为压缩格式 (支持.gz, .zip)")
     render_engine: RenderEngine = Field(..., description="渲染引擎类型 (maya/ue)")
     render_engine_conf: dict = Field(default_factory=dict, description="渲染引擎配置 (例如: Maya的renderer类型、UE的分辨率等)")
     priority: int = Field(default=5, ge=0, le=10, description="任务优先级 (0-10)")
@@ -19,7 +20,8 @@ class TaskCreate(BaseModel):
         json_schema_extra = {
             "example": {
                 "unionid": "user123",
-                "project_file": "C:/uploads/my_project.ma",
+                "oss_file_path": "projects/user123/my_project.ma.gz",
+                "is_compressed": True,
                 "render_engine": "maya",
                 "render_engine_conf": {
                     "renderer": "arnold",
@@ -36,7 +38,10 @@ class TaskResponse(BaseModel):
     """任务响应模型"""
     id: int
     unionid: str
-    project_file: str
+    oss_file_path: str
+    is_compressed: bool
+    project_file: Optional[str]  # 本地工程文件路径（下载解压后）
+    workspace_dir: Optional[str]  # 任务工作空间目录
     render_engine: str
     render_engine_conf: dict
     status: str

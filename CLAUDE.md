@@ -6,12 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 这是一个基于 FastAPI + Celery 的异步渲染任务管理服务，专门用于 Maya 和 Unreal Engine 的渲染作业调度。采用异步架构，通过 Redis 消息队列实现任务分发，支持优先级队列、逐帧进度跟踪和失败重试。
 
+**核心特性**：
+- **OSS 集成**：工程文件存储在阿里云OSS，支持自动下载和解压
+- **文件隔离**：每个任务都有独立的工作空间（按用户ID和任务ID隔离）
+- **自动清理**：任务完成后自动清理临时工作空间
+- **压缩支持**：支持 gzip (.gz) 和 zip 格式的压缩文件
+
 ## 核心架构
 
 ### 技术栈
 - **API 层**: FastAPI + Uvicorn
 - **任务队列**: Celery + Redis（使用 `--pool=solo` 以支持 Windows）
 - **数据库**: Tortoise ORM + SQLite（异步 ORM）
+- **对象存储**: 阿里云 OSS（oss2 SDK）
 - **渲染引擎**: Maya (Arnold) 和 Unreal Engine
 
 ### 架构模式
@@ -21,12 +28,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **数据库连接管理**: Celery Worker 通过自定义 DatabaseTask 基类在任务开始前初始化 Tortoise ORM 连接
 
 ### 关键流程
-1. 用户通过 `/api/tasks/` 创建渲染任务 → RenderTask 记录写入数据库
+1. 用户通过 `/api/tasks/` 创建渲染任务 → RenderTask 记录写入数据库（包含 OSS 文件路径）
 2. API 层根据 priority 分发 Celery 任务到对应队列
 3. Worker 获取任务，调用 `app.celery_app.tasks.render_task`
-4. 逐帧调用渲染引擎适配器 (`services.renderer`)，更新 RenderFrame 状态
-5. 每帧完成后异步触发缩略图生成 (`generate_thumbnail.delay()`)
-6. 用户可通过 `/api/tasks/{id}/status` 轮询进度
+4. **文件准备阶段**：
+   - 创建隔离的工作空间目录 (`workspace/{unionid}/{task_id}`)
+   - 从 OSS 下载工程文件到 `source/` 目录
+   - 如果是压缩文件，解压到 `project/` 目录
+   - 查找并更新本地工程文件路径
+5. **渲染阶段**：逐帧调用渲染引擎适配器 (`services.renderer`)，更新 RenderFrame 状态
+6. 每帧完成后异步触发缩略图生成 (`generate_thumbnail.delay()`)
+7. **清理阶段**：任务完成/失败/取消后，自动删除工作空间目录
+8. 用户可通过 `/api/tasks/{id}/status` 轮询进度
 
 ## 常用命令
 
@@ -94,6 +107,24 @@ redis-cli ping
 - 任务优先级 8-10 → `high_priority` 队列
 - `celery_app/celery.py` 中的 `task_routes` 配置任务到队列的映射
 
+### 7. OSS 文件管理
+- **文件存储**：工程文件存储在阿里云OSS，支持压缩格式
+- **下载服务** (`services/oss_storage.py`)：封装 OSS SDK，提供下载、上传、删除等操作
+- **解压服务** (`services/file_handler.py`)：支持 .gz 和 .zip 格式
+- **文件准备服务** (`services/file_preparation.py`)：整合下载、解压、查找工程文件的完整流程
+
+### 8. 文件隔离机制
+- **目录结构**：
+  ```
+  C:/workspace/
+    └── {unionid}/              # 用户级隔离
+        └── {task_id}/          # 任务级隔离
+            ├── source/         # OSS下载的原始文件
+            └── project/        # 解压后的工程文件
+  ```
+- **自动清理**：任务完成、失败或取消后自动删除工作空间
+- **重试保护**：任务重试时不清理工作空间，只在最终失败时清理
+
 ## 环境配置
 
 ### 必需的环境变量（.env 文件）
@@ -105,20 +136,33 @@ DATABASE_URL=sqlite://db.sqlite3
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-# 渲染引擎路径（必须根据实际安装路径修改）
-MAYA_EXECUTABLE=C:/Program Files/Autodesk/Maya2024/bin/Render.exe
-UE_EXECUTABLE=C:/Program Files/Epic Games/UE_5.3/Engine/Binaries/Win64/UnrealEditor-Cmd.exe
+# 阿里云OSS配置（必需）
+OSS_ENDPOINT=oss-cn-hangzhou.aliyuncs.com
+OSS_ACCESS_KEY_ID=your_access_key_id
+OSS_ACCESS_KEY_SECRET=your_access_key_secret
+OSS_BUCKET_NAME=your_bucket_name
 
 # 文件存储
 RENDER_OUTPUT_DIR=C:/render_outputs
 THUMBNAIL_DIR=C:/render_outputs/thumbnails
 UPLOAD_DIR=C:/uploads
+WORKSPACE_ROOT_DIR=C:/workspace  # 任务工作空间根目录
+
+# 渲染引擎路径（必须根据实际安装路径修改）
+MAYA_EXECUTABLE=C:/Program Files/Autodesk/Maya2024/bin/Render.exe
+UE_EXECUTABLE=C:/Program Files/Epic Games/UE_5.3/Engine/Binaries/Win64/UnrealEditor-Cmd.exe
 ```
 
 ## 数据模型关系
 
 ### RenderTask (app/models/task.py)
-- **主要字段**: `project_file`, `render_engine` (maya/ue), `status`, `priority`, `celery_task_id`
+- **主要字段**:
+  - `unionid`: 用户ID
+  - `oss_file_path`: OSS上的文件路径
+  - `is_compressed`: 是否为压缩文件
+  - `project_file`: 本地工程文件路径（下载解压后）
+  - `workspace_dir`: 任务工作空间目录
+  - `render_engine` (maya/ue), `status`, `priority`, `celery_task_id`
 - **关系**: 一对多关联 `RenderFrame`（通过 `frames` 反向关系）
 - **排序**: 按优先级和创建时间降序 (`ordering = ["-priority", "-created_at"]`)
 
@@ -173,12 +217,23 @@ UPLOAD_DIR=C:/uploads
 
 ### 手动测试
 ```bash
-# 创建测试任务
+# 创建测试任务（使用OSS文件路径）
 curl -X POST "http://localhost:8000/api/tasks/" \
   -H "Content-Type: application/json" \
-  -d '{"project_file": "C:/test.ma", "render_engine": "maya", "priority": 5, "total_frames": 10}'
+  -d '{
+    "unionid": "user123",
+    "oss_file_path": "projects/user123/test_scene.ma.gz",
+    "is_compressed": true,
+    "render_engine": "maya",
+    "render_engine_conf": {"renderer": "arnold"},
+    "priority": 5,
+    "total_frames": 10
+  }'
 
-# 查询状态
+# 查询任务详情
+curl "http://localhost:8000/api/tasks/1"
+
+# 查询任务状态
 curl "http://localhost:8000/api/tasks/1/status"
 
 # 取消任务
@@ -206,3 +261,14 @@ curl -X POST "http://localhost:8000/api/tasks/1/cancel"
 - 缩略图生成失败不会影响主渲染任务
 - 检查 `THUMBNAIL_DIR` 目录权限
 - 确认 Pillow 库已正确安装
+
+### OSS 文件下载失败
+- 检查 `.env` 中的 OSS 配置是否正确（AccessKey、Bucket等）
+- 确认 OSS 文件路径存在（使用 OSS 控制台或 ossutil 工具验证）
+- 检查网络连接和防火墙设置
+- 查看 Worker 日志中的详细错误信息
+
+### 工作空间清理问题
+- 如果任务失败但工作空间未清理，手动删除 `C:/workspace/{unionid}/{task_id}`
+- 可以定期运行清理脚本删除过期的工作空间
+- 检查磁盘空间，确保有足够空间存储临时文件
