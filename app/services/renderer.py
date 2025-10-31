@@ -21,7 +21,8 @@ class BaseRenderer(ABC):
         self,
         project_file: str,
         frame_number: int,
-        output_dir: Path
+        output_dir: Path,
+        engine_conf: Optional[dict] = None
     ) -> Path:
         """
         渲染单帧
@@ -30,6 +31,7 @@ class BaseRenderer(ABC):
             project_file: 工程文件路径
             frame_number: 帧序号
             output_dir: 输出目录
+            engine_conf: 引擎配置字典
 
         Returns:
             渲染结果文件路径
@@ -78,19 +80,25 @@ class MayaRenderer(BaseRenderer):
         self,
         project_file: str,
         frame_number: int,
-        output_dir: Path
+        output_dir: Path,
+        engine_conf: Optional[dict] = None
     ) -> Path:
         """使用Maya批处理模式渲染单帧"""
 
         # 确保输出目录存在
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        # 从配置中获取渲染器类型，默认使用Arnold
+        if engine_conf is None:
+            engine_conf = {}
+        renderer = engine_conf.get("renderer", "arnold")
+
         # 构建Maya渲染命令
         # "C:\SoftWare\Maya\maya2025\Maya 2025.3.1\Maya2025\bin\Render.exe" -r arnold -rd C:\Project\WJMRender\Render -s 1 -e 24 -b 1 "C:\Project\WJMRender\MayaProject\scenes\Qiu_Test_v001.ma"
         # mayabatch -file <project.ma> -render <renderer> -s <start> -e <end> -rd <output_dir>
         command = [
             str(self.executable),
-            "-r", "arnold",  # 默认使用Arnold渲染器，可根据需要修改
+            "-r", renderer,  # 从配置中获取渲染器类型
             "-rd", str(output_dir),  # 输出目录
             "-s", str(frame_number),  # 起始帧
             "-e", str(frame_number),  # 结束帧
@@ -144,12 +152,20 @@ class UERenderer(BaseRenderer):
         self,
         project_file: str,
         frame_number: int,
-        output_dir: Path
+        output_dir: Path,
+        engine_conf: Optional[dict] = None
     ) -> Path:
         """使用UE命令行模式渲染单帧"""
 
         # 确保输出目录存在
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        # 从配置中获取参数（可选）
+        if engine_conf is None:
+            engine_conf = {}
+        res_x = engine_conf.get("resolution_x", 1920)
+        res_y = engine_conf.get("resolution_y", 1080)
+        quality = engine_conf.get("quality", 100)
 
         # 构建UE渲染命令
         # UnrealEditor-Cmd.exe <project.uproject> -game -MovieSceneCaptureType=... -Frame=<frame>
@@ -166,9 +182,9 @@ class UERenderer(BaseRenderer):
             f"-MovieFrameEnd={frame_number}",
             f"-MovieFolder={output_dir}",
             "-MovieFormat=PNG",
-            "-MovieQuality=100",
-            "-ResX=1920",
-            "-ResY=1080",
+            f"-MovieQuality={quality}",
+            f"-ResX={res_x}",
+            f"-ResY={res_y}",
             "-ForceRes",
             "-Windowed",
             "-NoLoadingScreen",

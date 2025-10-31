@@ -25,8 +25,10 @@ async def create_task(task_data: TaskCreate):
     try:
         # 创建任务记录
         task = await RenderTask.create(
+            unionid=task_data.unionid,
             project_file=task_data.project_file,
             render_engine=task_data.render_engine,
+            render_engine_conf=task_data.render_engine_conf,
             priority=task_data.priority,
             total_frames=task_data.total_frames,
             max_retries=task_data.max_retries,
@@ -66,8 +68,10 @@ async def create_task(task_data: TaskCreate):
         # 返回任务信息
         return TaskResponse(
             id=task.id,
+            unionid=task.unionid,
             project_file=task.project_file,
             render_engine=task.render_engine.value,
+            render_engine_conf=task.render_engine_conf,
             status=task.status.value,
             priority=task.priority,
             total_frames=task.total_frames,
@@ -95,8 +99,10 @@ async def get_task(task_id: int):
 
     return TaskResponse(
         id=task.id,
+        unionid=task.unionid,
         project_file=task.project_file,
         render_engine=task.render_engine.value,
+        render_engine_conf=task.render_engine_conf,
         status=task.status.value,
         priority=task.priority,
         total_frames=task.total_frames,
@@ -156,8 +162,10 @@ async def list_tasks(
     task_responses = [
         TaskResponse(
             id=task.id,
+            unionid=task.unionid,
             project_file=task.project_file,
             render_engine=task.render_engine.value,
+            render_engine_conf=task.render_engine_conf,
             status=task.status.value,
             priority=task.priority,
             total_frames=task.total_frames,

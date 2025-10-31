@@ -23,10 +23,14 @@ class RenderTask(Model):
     """渲染任务模型"""
 
     id = fields.IntField(pk=True)
+    # 用户ID
+    unionid = fields.CharField(max_length=255)
     # 工程文件路径
     project_file = fields.CharField(max_length=500)
     # 渲染引擎
     render_engine = fields.CharEnumField(RenderEngine, max_length=20)
+    # 引擎配置
+    render_engine_conf = fields.JSONField(default=dict)
     # 任务状态
     status = fields.CharEnumField(TaskStatus, max_length=20, default=TaskStatus.PENDING)
     # 优先级 (0-10, 数字越大优先级越高)

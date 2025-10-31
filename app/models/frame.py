@@ -17,7 +17,7 @@ class RenderFrame(Model):
 
     id = fields.IntField(pk=True)
     # 关联的任务
-    task = fields.ForeignKeyField("models.RenderTask", related_name="frames", on_delete=fields.CASCADE)
+    task = fields.ForeignKeyField("models.RenderTask", related_name="frames", on_delete=fields.CASCADE, db_constraint=False)
     # 帧序号
     frame_number = fields.IntField()
     # 帧状态
@@ -30,6 +30,9 @@ class RenderFrame(Model):
     render_time = fields.FloatField(null=True)
     # 错误信息
     error_message = fields.TextField(null=True)
+    # 渲染日志
+    stdout = fields.TextField(null=True)
+    stderr = fields.TextField(null=True)
     # 时间戳
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)

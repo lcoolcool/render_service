@@ -88,7 +88,8 @@ def render_task(self, task_id: int):
                 output_path = renderer.render_frame(
                     project_file=task.project_file,
                     frame_number=frame.frame_number,
-                    output_dir=settings.render_output_dir
+                    output_dir=settings.render_output_dir,
+                    engine_conf=task.render_engine_conf
                 )
                 render_time = time.time() - start_time
 

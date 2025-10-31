@@ -7,8 +7,10 @@ from app.models.task import TaskStatus, RenderEngine
 
 class TaskCreate(BaseModel):
     """创建任务的请求模型"""
+    unionid: str = Field(..., description="用户ID")
     project_file: str = Field(..., description="工程文件路径")
     render_engine: RenderEngine = Field(..., description="渲染引擎类型 (maya/ue)")
+    render_engine_conf: dict = Field(default_factory=dict, description="渲染引擎配置 (例如: Maya的renderer类型、UE的分辨率等)")
     priority: int = Field(default=5, ge=0, le=10, description="任务优先级 (0-10)")
     total_frames: int = Field(..., gt=0, description="总帧数")
     max_retries: int = Field(default=3, ge=0, description="最大重试次数")
@@ -16,8 +18,13 @@ class TaskCreate(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
+                "unionid": "user123",
                 "project_file": "C:/uploads/my_project.ma",
                 "render_engine": "maya",
+                "render_engine_conf": {
+                    "renderer": "arnold",
+                    "quality": "high"
+                },
                 "priority": 7,
                 "total_frames": 100,
                 "max_retries": 3
@@ -28,8 +35,10 @@ class TaskCreate(BaseModel):
 class TaskResponse(BaseModel):
     """任务响应模型"""
     id: int
+    unionid: str
     project_file: str
     render_engine: str
+    render_engine_conf: dict
     status: str
     priority: int
     total_frames: int
