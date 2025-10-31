@@ -1,0 +1,23 @@
+# Web框架
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# 异步任务处理
+celery==5.3.6
+redis==5.0.1
+kombu==5.3.5
+
+# 数据库
+tortoise-orm==0.20.0
+aiosqlite==0.19.0
+
+# 数据验证
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# 图像处理（缩略图生成）
+Pillow==10.2.0
+
+# 工具库
+python-dotenv==1.0.0
