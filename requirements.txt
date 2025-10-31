@@ -18,6 +18,8 @@ pydantic-settings==2.11.0
 
 # 图像处理（缩略图生成）
 Pillow==12.0.0
+imageio==2.37.0  # EXR格式支持
+numpy==2.3.4  # imageio依赖
 
 # 阿里云OSS存储
 oss2==2.18.4

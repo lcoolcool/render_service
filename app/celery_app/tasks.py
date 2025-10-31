@@ -51,7 +51,6 @@ def render_task(self, task_id: int):
     from app.models.task import RenderTask, TaskStatus
     from app.models.frame import RenderFrame, FrameStatus
     from app.services.renderer import get_renderer
-    from app.services.thumbnail import generate_thumbnail
 
     loop = asyncio.get_event_loop()
 
@@ -135,8 +134,8 @@ def render_task(self, task_id: int):
                 frame.stderr = stderr
                 loop.run_until_complete(frame.save())
 
-                # 异步生成缩略图
-                generate_thumbnail.delay(frame.id)
+                # 异步生成缩略图（传递必要的上下文信息）
+                generate_thumbnail.delay(frame.id, task.unionid, task.id)
 
                 # 更新任务进度
                 task.completed_frames += 1
@@ -213,43 +212,74 @@ def render_task(self, task_id: int):
 @celery_app.task(
     bind=True,
     base=DatabaseTask,
-    name="app.celery_app.tasks.generate_thumbnail"
+    name="app.celery_app.tasks.generate_thumbnail",
+    max_retries=3,
+    default_retry_delay=5  # 5秒后重试
 )
-def generate_thumbnail(self, frame_id: int):
+def generate_thumbnail(self, frame_id: int, unionid: str = None, task_id: int = None):
     """
     生成缩略图任务
 
     Args:
         frame_id: 渲染帧ID
+        unionid: 用户ID（用于目录隔离）
+        task_id: 任务ID（用于目录隔离）
     """
     from app.models.frame import RenderFrame
     from app.services.thumbnail import ThumbnailService
 
     loop = asyncio.get_event_loop()
 
-    # 获取帧信息
-    frame = loop.run_until_complete(RenderFrame.get(id=frame_id))
-
-    if not frame.output_path or not Path(frame.output_path).exists():
-        raise ValueError(f"渲染结果文件不存在: {frame.output_path}")
-
     try:
+        # 获取帧信息
+        frame = loop.run_until_complete(RenderFrame.get(id=frame_id))
+
+        if not frame.output_path:
+            logger.warning(f"帧 {frame_id} 没有输出路径，跳过缩略图生成")
+            return
+
+        output_path = Path(frame.output_path)
+
+        # 检查文件是否存在（添加重试机制以处理文件系统延迟）
+        if not output_path.exists():
+            logger.warning(f"渲染文件暂不存在: {output_path}，尝试重试...")
+            # 抛出异常触发自动重试
+            raise FileNotFoundError(f"渲染结果文件不存在: {frame.output_path}")
+
         # 生成缩略图
         thumbnail_service = ThumbnailService()
         thumbnail_path = thumbnail_service.generate(
-            image_path=Path(frame.output_path),
+            image_path=output_path,
             output_dir=settings.thumbnail_dir,
-            size=settings.thumbnail_size
+            size=settings.thumbnail_size,
+            frame_id=frame_id,
+            unionid=unionid,
+            task_id=task_id
         )
 
         # 更新帧信息
         frame.thumbnail_path = str(thumbnail_path)
         loop.run_until_complete(frame.save())
 
+        logger.info(f"成功为帧 {frame_id} 生成缩略图: {thumbnail_path}")
+
+    except FileNotFoundError as e:
+        # 文件不存在，尝试重试
+        logger.warning(f"缩略图生成失败（文件不存在），将在 5 秒后重试: {str(e)}")
+        raise self.retry(exc=e, countdown=5)
+
     except Exception as e:
-        # 缩略图生成失败不影响主任务
-        self.update_state(
-            state="FAILURE",
-            meta={"error": str(e)}
-        )
-        raise
+        # 其他错误，记录日志但不影响主任务
+        logger.error(f"缩略图生成失败（帧 {frame_id}）: {str(e)}", exc_info=True)
+
+        # 如果还有重试次数，尝试重试
+        if self.request.retries < self.max_retries:
+            logger.info(f"将重试缩略图生成（第 {self.request.retries + 1}/{self.max_retries} 次）")
+            raise self.retry(exc=e, countdown=10)
+        else:
+            # 达到最大重试次数，记录但不抛出异常（避免影响主任务）
+            logger.error(f"缩略图生成达到最大重试次数，放弃生成（帧 {frame_id}）")
+            self.update_state(
+                state="FAILURE",
+                meta={"error": str(e), "frame_id": frame_id}
+            )
