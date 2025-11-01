@@ -20,10 +20,8 @@ class Settings(BaseSettings):
     celery_result_backend: str = "redis://localhost:6379/1"
 
     # 文件存储配置
-    render_output_dir: Path = Path("C:/Project/test/render")
-    thumbnail_dir: Path = Path("C:/render_outputs/thumbnails")
     upload_dir: Path = Path("C:/uploads")
-    workspace_root_dir: Path = Path("C:/workspace")  # 任务工作空间根目录
+    workspace_root_dir: Path = Path("C:/workspace")  # 任务工作空间根目录（包含所有任务的source、project、renders、thumbnails）
 
     # 阿里云OSS配置
     oss_endpoint: str = "oss-cn-hangzhou.aliyuncs.com"  # OSS访问域名
@@ -53,8 +51,6 @@ class Settings(BaseSettings):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # 确保必要的目录存在
-        self.render_output_dir.mkdir(parents=True, exist_ok=True)
-        self.thumbnail_dir.mkdir(parents=True, exist_ok=True)
         self.upload_dir.mkdir(parents=True, exist_ok=True)
         self.workspace_root_dir.mkdir(parents=True, exist_ok=True)
 

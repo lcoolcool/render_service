@@ -76,7 +76,7 @@ def render_task(self, task_id: int):
         # 1. 准备工程文件（从OSS下载并解压）
 
         try:
-            project_file, workspace_dir = file_prep_service.prepare_project_files(
+            project_file, workspace_dir, renders_dir, thumbnails_dir = file_prep_service.prepare_project_files(
                 unionid=task.unionid,
                 task_id=task.id,
                 oss_file_path=task.oss_file_path,
@@ -87,6 +87,8 @@ def render_task(self, task_id: int):
             # 更新任务的本地文件路径和工作空间
             task.project_file = str(project_file)
             task.workspace_dir = str(workspace_dir)
+            task.renders_dir = str(renders_dir)
+            task.thumbnails_dir = str(thumbnails_dir)
             loop.run_until_complete(task.save())
 
         except Exception as e:
@@ -121,7 +123,7 @@ def render_task(self, task_id: int):
                 output_path, stdout, stderr = renderer.render_frame(
                     project_file=task.project_file,
                     frame_number=frame.frame_number,
-                    output_dir=settings.render_output_dir,
+                    output_dir=Path(task.renders_dir),
                     engine_conf=task.render_engine_conf
                 )
                 render_time = time.time() - start_time
@@ -174,36 +176,21 @@ def render_task(self, task_id: int):
 
         loop.run_until_complete(task.save())
 
-        # 清理工作空间
-        if task.workspace_dir:
-            file_prep_service.cleanup_workspace(Path(task.workspace_dir))
+        logger.info(f"任务 {task_id} 完成，工作空间保留在: {task.workspace_dir}")
 
     except Ignore:
-        # 任务被取消，清理工作空间
+        # 任务被取消
         task.status = TaskStatus.CANCELLED
         loop.run_until_complete(task.save())
-
-        if task.workspace_dir:
-            try:
-                file_prep_service.cleanup_workspace(Path(task.workspace_dir))
-            except Exception as cleanup_error:
-                # 记录清理错误但不影响任务取消
-                logger.warning(f"清理工作空间失败: {cleanup_error}")
+        logger.info(f"任务 {task_id} 已取消，工作空间保留在: {task.workspace_dir}")
         raise
 
     except Exception as e:
-        # 任务失败，清理工作空间
+        # 任务失败
         task.status = TaskStatus.FAILED
         task.error_message = str(e)
         loop.run_until_complete(task.save())
-
-        # 清理工作空间
-        if task.workspace_dir:
-            try:
-                file_prep_service.cleanup_workspace(Path(task.workspace_dir))
-            except Exception as cleanup_error:
-                # 记录清理错误但不影响任务失败状态
-                logger.warning(f"清理工作空间失败: {cleanup_error}")
+        logger.error(f"任务 {task_id} 失败，工作空间保留在: {task.workspace_dir}")
 
         # 重新抛出原始异常，让Celery记录错误
         raise
@@ -246,11 +233,15 @@ def generate_thumbnail(self, frame_id: int, unionid: str = None, task_id: int = 
             # 抛出异常触发自动重试
             raise FileNotFoundError(f"渲染结果文件不存在: {frame.output_path}")
 
+        # 获取任务信息以获取缩略图目录
+        from app.models.task import RenderTask
+        task = loop.run_until_complete(RenderTask.get(id=frame.task_id))
+
         # 生成缩略图
         thumbnail_service = ThumbnailService()
         thumbnail_path = thumbnail_service.generate(
             image_path=output_path,
-            output_dir=settings.thumbnail_dir,
+            output_dir=Path(task.thumbnails_dir),
             size=settings.thumbnail_size,
             frame_id=frame_id,
             unionid=unionid,
@@ -283,3 +274,105 @@ def generate_thumbnail(self, frame_id: int, unionid: str = None, task_id: int = 
                 state="FAILURE",
                 meta={"error": str(e), "frame_id": frame_id}
             )
+
+
+@celery_app.task(
+    bind=True,
+    base=DatabaseTask,
+    name="app.celery_app.tasks.retry_render_frame",
+    max_retries=3,
+    default_retry_delay=60
+)
+def retry_render_frame(self, task_id: int, frame_number: int):
+    """
+    重新渲染单个失败的帧
+
+    Args:
+        task_id: 任务ID
+        frame_number: 帧号
+    """
+    from app.models.task import RenderTask, TaskStatus
+    from app.models.frame import RenderFrame, FrameStatus
+    from app.services.renderer import get_renderer
+
+    loop = asyncio.get_event_loop()
+
+    try:
+        # 获取任务信息
+        task = loop.run_until_complete(RenderTask.get(id=task_id))
+
+        # 检查任务状态
+        if task.status == TaskStatus.CANCELLED:
+            logger.warning(f"任务 {task_id} 已取消，跳过帧 {frame_number} 的重试")
+            return
+
+        # 获取帧信息
+        frame = loop.run_until_complete(
+            RenderFrame.get(task_id=task_id, frame_number=frame_number)
+        )
+
+        # 更新帧状态为渲染中
+        frame.status = FrameStatus.RENDERING
+        frame.error_message = None
+        loop.run_until_complete(frame.save())
+
+        logger.info(f"开始重试渲染：任务 {task_id}，帧 {frame_number}")
+
+        # 获取渲染引擎
+        renderer = get_renderer(task.render_engine)
+
+        # 执行渲染
+        start_time = time.time()
+        output_path, stdout, stderr = renderer.render_frame(
+            project_file=task.project_file,
+            frame_number=frame.frame_number,
+            output_dir=Path(task.renders_dir),
+            engine_conf=task.render_engine_conf
+        )
+        render_time = time.time() - start_time
+
+        # 更新帧信息
+        frame.status = FrameStatus.COMPLETED
+        frame.output_path = str(output_path)
+        frame.render_time = render_time
+        frame.stdout = stdout
+        frame.stderr = stderr
+        loop.run_until_complete(frame.save())
+
+        # 更新任务的已完成帧数
+        task.completed_frames = loop.run_until_complete(
+            RenderFrame.filter(task_id=task_id, status=FrameStatus.COMPLETED).count()
+        )
+
+        # 如果所有帧都完成了，更新任务状态
+        if task.completed_frames == task.total_frames:
+            task.status = TaskStatus.COMPLETED
+        elif task.status == TaskStatus.FAILED:
+            # 如果之前是失败状态，现在改为部分完成
+            task.status = TaskStatus.COMPLETED
+
+        loop.run_until_complete(task.save())
+
+        # 异步生成缩略图
+        generate_thumbnail.delay(frame.id, task.unionid, task.id)
+
+        logger.info(f"成功重试渲染：任务 {task_id}，帧 {frame_number}")
+
+    except Exception as e:
+        # 渲染失败
+        logger.error(f"重试渲染失败：任务 {task_id}，帧 {frame_number}，错误: {str(e)}")
+
+        frame = loop.run_until_complete(
+            RenderFrame.get(task_id=task_id, frame_number=frame_number)
+        )
+        frame.status = FrameStatus.FAILED
+        frame.error_message = str(e)
+        loop.run_until_complete(frame.save())
+
+        # 如果还有重试次数，继续重试
+        if self.request.retries < self.max_retries:
+            logger.info(f"将在60秒后重试（第 {self.request.retries + 1}/{self.max_retries} 次）")
+            raise self.retry(exc=e, countdown=60)
+        else:
+            logger.error(f"达到最大重试次数，放弃渲染帧 {frame_number}")
+            raise

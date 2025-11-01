@@ -8,8 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **核心特性**：
 - **OSS 集成**：工程文件存储在阿里云OSS，支持自动下载和解压
-- **文件隔离**：每个任务都有独立的工作空间（按用户ID和任务ID隔离）
-- **自动清理**：任务完成后自动清理临时工作空间
+- **文件隔离**：每个任务都有独立的工作空间（按用户ID和任务ID隔离，包含 source/、project/、renders/、thumbnails/ 四个子目录）
+- **手动清理**：任务完成后工作空间保留，支持失败帧重试，用户可按需清理
+- **单帧重试**：支持重试失败的帧，无需重新下载文件
 - **压缩支持**：支持 gzip (.gz) 和 zip 格式的压缩文件
 
 ## 核心架构
@@ -32,14 +33,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 2. API 层根据 priority 分发 Celery 任务到对应队列
 3. Worker 获取任务，调用 `app.celery_app.tasks.render_task`
 4. **文件准备阶段**：
-   - 创建隔离的工作空间目录 (`workspace/{unionid}/{task_id}`)
+   - 创建隔离的工作空间目录 (`workspace/{unionid}/{task_id}`)，包含 source/、project/、renders/、thumbnails/ 四个子目录
    - 从 OSS 下载工程文件到 `source/` 目录
    - 如果是压缩文件，解压到 `project/` 目录
    - 查找并更新本地工程文件路径
-5. **渲染阶段**：逐帧调用渲染引擎适配器 (`services.renderer`)，更新 RenderFrame 状态
-6. 每帧完成后异步触发缩略图生成 (`generate_thumbnail.delay()`)
-7. **清理阶段**：任务完成/失败/取消后，自动删除工作空间目录
-8. 用户可通过 `/api/tasks/{id}/status` 轮询进度
+5. **渲染阶段**：逐帧调用渲染引擎适配器 (`services.renderer`)，输出到 `renders/` 目录，更新 RenderFrame 状态
+6. 每帧完成后异步触发缩略图生成到 `thumbnails/` 目录 (`generate_thumbnail.delay()`)
+7. **完成阶段**：任务完成/失败/取消后，工作空间保留（支持失败帧重试）
+8. 用户可通过 `/api/tasks/{id}/status` 轮询进度，失败帧可通过 `/api/tasks/{id}/frames/{frame_number}/retry` 重试
 
 ## 常用命令
 
@@ -120,10 +121,13 @@ redis-cli ping
     └── {unionid}/              # 用户级隔离
         └── {task_id}/          # 任务级隔离
             ├── source/         # OSS下载的原始文件
-            └── project/        # 解压后的工程文件
+            ├── project/        # 解压后的工程文件
+            ├── renders/        # 渲染输出文件
+            └── thumbnails/     # 缩略图文件
   ```
-- **自动清理**：任务完成、失败或取消后自动删除工作空间
-- **重试保护**：任务重试时不清理工作空间，只在最终失败时清理
+- **手动清理**：任务完成、失败或取消后工作空间保留，用户可通过 API 手动清理
+- **单帧重试**：失败的帧可以重新渲染，复用已下载的工程文件，无需重新从 OSS 下载
+- **批量清理**：支持按状态、时间、用户ID批量清理工作空间
 
 ## 环境配置
 
@@ -143,10 +147,10 @@ OSS_ACCESS_KEY_SECRET=your_access_key_secret
 OSS_BUCKET_NAME=your_bucket_name
 
 # 文件存储
-RENDER_OUTPUT_DIR=C:/render_outputs
-THUMBNAIL_DIR=C:/render_outputs/thumbnails
 UPLOAD_DIR=C:/uploads
-WORKSPACE_ROOT_DIR=C:/workspace  # 任务工作空间根目录
+# 工作空间根目录（每个任务都会创建独立的子目录：{unionid}/{task_id}/）
+# 包含：source/、project/、renders/、thumbnails/ 四个子目录
+WORKSPACE_ROOT_DIR=C:/workspace
 
 # 渲染引擎路径（必须根据实际安装路径修改）
 MAYA_EXECUTABLE=C:/Program Files/Autodesk/Maya2024/bin/Render.exe
@@ -177,6 +181,9 @@ UE_EXECUTABLE=C:/Program Files/Epic Games/UE_5.3/Engine/Binaries/Win64/UnrealEdi
 - `GET /api/tasks/{id}/status` - 查询任务状态和进度
 - `GET /api/tasks/{id}/frames` - 获取所有渲染帧信息
 - `POST /api/tasks/{id}/cancel` - 取消任务
+- `POST /api/tasks/{id}/cleanup` - 清理单个任务的工作空间
+- `POST /api/tasks/cleanup` - 批量清理任务工作空间（支持按状态、时间、用户ID过滤）
+- `POST /api/tasks/{id}/frames/{frame_number}/retry` - 重试渲染失败的帧
 
 ### 文件服务 (app/api/files.py)
 - `GET /api/files/download/{frame_id}` - 下载渲染结果
@@ -259,7 +266,7 @@ curl -X POST "http://localhost:8000/api/tasks/1/cancel"
 
 ### 缩略图生成失败
 - 缩略图生成失败不会影响主渲染任务
-- 检查 `THUMBNAIL_DIR` 目录权限
+- 检查任务工作空间下的 `thumbnails/` 目录权限
 - 确认 Pillow 库已正确安装
 
 ### OSS 文件下载失败
@@ -268,7 +275,9 @@ curl -X POST "http://localhost:8000/api/tasks/1/cancel"
 - 检查网络连接和防火墙设置
 - 查看 Worker 日志中的详细错误信息
 
-### 工作空间清理问题
-- 如果任务失败但工作空间未清理，手动删除 `C:/workspace/{unionid}/{task_id}`
-- 可以定期运行清理脚本删除过期的工作空间
-- 检查磁盘空间，确保有足够空间存储临时文件
+### 工作空间管理
+- 任务完成/失败后，工作空间**不会自动清理**（方便失败帧重试）
+- 清理单个任务：`POST /api/tasks/{id}/cleanup`
+- 批量清理：`POST /api/tasks/cleanup?status=completed&days=7`（清理7天前已完成的任务）
+- 手动删除：直接删除 `C:/workspace/{unionid}/{task_id}` 目录
+- 定期清理建议：使用批量清理接口定期清理旧任务，避免磁盘空间不足

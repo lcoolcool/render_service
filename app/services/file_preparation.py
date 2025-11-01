@@ -25,7 +25,7 @@ class FilePreparationService:
         oss_file_path: str,
         is_compressed: bool,
         render_engine: RenderEngine
-    ) -> Tuple[Path, Path]:
+    ) -> Tuple[Path, Path, Path, Path]:
         """
         准备渲染工程文件（完整流程）
 
@@ -34,7 +34,7 @@ class FilePreparationService:
         2. 从OSS下载文件到 source/ 目录
         3. 如果是压缩文件，解压到 project/ 目录
         4. 查找工程文件路径
-        5. 返回工程文件路径和工作空间路径
+        5. 返回工程文件路径、工作空间路径、渲染输出目录和缩略图目录
 
         Args:
             unionid: 用户ID（用于目录隔离）
@@ -44,7 +44,7 @@ class FilePreparationService:
             render_engine: 渲染引擎类型（用于确定工程文件扩展名）
 
         Returns:
-            (工程文件路径, 工作空间目录路径)
+            (工程文件路径, 工作空间目录路径, 渲染输出目录, 缩略图目录)
 
         Raises:
             FileNotFoundError: 文件下载或查找失败
@@ -55,9 +55,13 @@ class FilePreparationService:
             workspace_dir = self._create_workspace(unionid, task_id)
             source_dir = workspace_dir / "source"
             project_dir = workspace_dir / "project"
+            renders_dir = workspace_dir / "renders"
+            thumbnails_dir = workspace_dir / "thumbnails"
 
             source_dir.mkdir(parents=True, exist_ok=True)
             project_dir.mkdir(parents=True, exist_ok=True)
+            renders_dir.mkdir(parents=True, exist_ok=True)
+            thumbnails_dir.mkdir(parents=True, exist_ok=True)
 
             logger.info(f"创建工作空间: {workspace_dir}")
 
@@ -92,7 +96,7 @@ class FilePreparationService:
                 )
 
             logger.info(f"文件准备完成: {project_file}")
-            return project_file, workspace_dir
+            return project_file, workspace_dir, renders_dir, thumbnails_dir
 
         except Exception as e:
             logger.error(f"文件准备失败: {e}")
@@ -109,8 +113,10 @@ class FilePreparationService:
         workspace_root/
           └── {unionid}/
               └── {task_id}/
-                  ├── source/     # OSS下载的原始文件
-                  └── project/    # 解压后的工程文件
+                  ├── source/       # OSS下载的原始文件
+                  ├── project/      # 解压后的工程文件
+                  ├── renders/      # 渲染输出文件
+                  └── thumbnails/   # 缩略图文件
 
         Args:
             unionid: 用户ID

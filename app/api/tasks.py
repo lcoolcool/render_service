@@ -6,7 +6,7 @@ from app.schemas.frame import FrameResponse, FrameListResponse
 from app.models.task import RenderTask, TaskStatus
 from app.models.frame import RenderFrame, FrameStatus
 from app.celery_app.celery import celery_app
-from app.celery_app.tasks import render_task
+from app.celery_app.tasks import render_task, retry_render_frame
 
 router = APIRouter(prefix="/api/tasks", tags=["任务管理"])
 
@@ -295,3 +295,191 @@ async def delete_task(task_id: int):
     await task.delete()
 
     return {"message": "任务已删除", "task_id": task_id}
+
+
+@router.post("/{task_id}/cleanup", summary="清理任务工作空间")
+async def cleanup_task_workspace(task_id: int):
+    """
+    清理指定任务的工作空间
+
+    - 删除工作空间目录及所有文件（包括source、project、renders、thumbnails）
+    - 只能清理已完成、失败或已取消的任务
+    - 正在运行的任务无法清理
+    """
+    from pathlib import Path
+    from app.services.file_preparation import FilePreparationService
+
+    task = await RenderTask.get_or_none(id=task_id)
+
+    if not task:
+        raise HTTPException(status_code=404, detail=f"任务不存在: {task_id}")
+
+    # 检查任务状态
+    if task.status == TaskStatus.RUNNING:
+        raise HTTPException(
+            status_code=400,
+            detail="无法清理正在运行的任务，请先取消任务"
+        )
+
+    # 检查工作空间是否存在
+    if not task.workspace_dir:
+        return {"message": "任务没有工作空间", "task_id": task_id}
+
+    workspace_path = Path(task.workspace_dir)
+    if not workspace_path.exists():
+        return {"message": "工作空间目录不存在", "task_id": task_id, "workspace": str(workspace_path)}
+
+    # 清理工作空间
+    file_prep_service = FilePreparationService()
+    success = file_prep_service.cleanup_workspace(workspace_path)
+
+    if success:
+        return {
+            "message": "工作空间已清理",
+            "task_id": task_id,
+            "workspace": str(workspace_path)
+        }
+    else:
+        raise HTTPException(status_code=500, detail="清理工作空间失败")
+
+
+@router.post("/cleanup", summary="批量清理任务工作空间")
+async def cleanup_tasks_workspace(
+    status: str = Query(None, description="按状态过滤（completed/failed/cancelled），多个状态用逗号分隔"),
+    days: int = Query(None, description="清理N天前的任务"),
+    unionid: str = Query(None, description="按用户ID过滤")
+):
+    """
+    批量清理任务工作空间
+
+    - 可按状态、时间、用户ID过滤
+    - 只清理已完成、失败或已取消的任务
+    - 返回清理的任务数和释放的空间
+    """
+    from pathlib import Path
+    from datetime import datetime, timedelta
+    from app.services.file_preparation import FilePreparationService
+
+    # 构建查询条件
+    query = RenderTask.all()
+
+    # 按状态过滤
+    if status:
+        status_list = [s.strip() for s in status.split(',')]
+        valid_statuses = [TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED]
+        filtered_statuses = [s for s in status_list if s in [vs.value for vs in valid_statuses]]
+
+        if not filtered_statuses:
+            raise HTTPException(
+                status_code=400,
+                detail="无效的状态值，只能清理 completed、failed 或 cancelled 状态的任务"
+            )
+
+        query = query.filter(status__in=filtered_statuses)
+    else:
+        # 默认只清理已完成、失败或已取消的任务
+        query = query.filter(status__in=[TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED])
+
+    # 按时间过滤
+    if days and days > 0:
+        cutoff_date = datetime.now() - timedelta(days=days)
+        query = query.filter(updated_at__lt=cutoff_date)
+
+    # 按用户ID过滤
+    if unionid:
+        query = query.filter(unionid=unionid)
+
+    tasks = await query.all()
+
+    if not tasks:
+        return {
+            "message": "没有符合条件的任务",
+            "cleaned_count": 0,
+            "total_size": 0
+        }
+
+    # 批量清理
+    file_prep_service = FilePreparationService()
+    cleaned_count = 0
+    total_size = 0
+    failed_tasks = []
+
+    for task in tasks:
+        if not task.workspace_dir:
+            continue
+
+        workspace_path = Path(task.workspace_dir)
+        if not workspace_path.exists():
+            continue
+
+        try:
+            # 获取目录大小
+            size = file_prep_service.get_workspace_size(workspace_path)
+            total_size += size
+
+            # 清理工作空间
+            success = file_prep_service.cleanup_workspace(workspace_path)
+            if success:
+                cleaned_count += 1
+            else:
+                failed_tasks.append(task.id)
+        except Exception as e:
+            failed_tasks.append(task.id)
+
+    return {
+        "message": f"成功清理 {cleaned_count} 个任务的工作空间",
+        "cleaned_count": cleaned_count,
+        "total_size_mb": round(total_size / (1024 * 1024), 2),
+        "failed_tasks": failed_tasks if failed_tasks else None
+    }
+
+
+@router.post("/{task_id}/frames/{frame_number}/retry", summary="重试渲染失败的帧")
+async def retry_frame(task_id: int, frame_number: int):
+    """
+    重新渲染单个失败的帧
+
+    - 只能重试失败（failed）状态的帧
+    - 复用已下载的工程文件，无需重新从 OSS 下载
+    - 异步执行，立即返回
+    """
+    # 检查任务是否存在
+    task = await RenderTask.get_or_none(id=task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail=f"任务不存在: {task_id}")
+
+    # 检查任务是否已取消
+    if task.status == TaskStatus.CANCELLED:
+        raise HTTPException(status_code=400, detail="任务已取消，无法重试")
+
+    # 检查工作空间是否存在
+    if not task.workspace_dir or not task.project_file:
+        raise HTTPException(
+            status_code=400,
+            detail="任务工作空间不存在，无法重试。请重新创建任务。"
+        )
+
+    # 检查帧是否存在
+    frame = await RenderFrame.get_or_none(task_id=task_id, frame_number=frame_number)
+    if not frame:
+        raise HTTPException(
+            status_code=404,
+            detail=f"帧不存在: task_id={task_id}, frame_number={frame_number}"
+        )
+
+    # 检查帧状态
+    if frame.status == FrameStatus.COMPLETED:
+        raise HTTPException(status_code=400, detail=f"帧 {frame_number} 已完成，无需重试")
+
+    if frame.status == FrameStatus.RENDERING:
+        raise HTTPException(status_code=400, detail=f"帧 {frame_number} 正在渲染中，请稍后")
+
+    # 提交重试任务
+    celery_task = retry_render_frame.delay(task_id, frame_number)
+
+    return {
+        "message": f"已提交帧 {frame_number} 的重试任务",
+        "task_id": task_id,
+        "frame_number": frame_number,
+        "celery_task_id": celery_task.id
+    }

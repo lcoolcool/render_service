@@ -33,6 +33,10 @@ class RenderTask(Model):
     project_file = fields.CharField(max_length=500, null=True)
     # 任务工作空间目录
     workspace_dir = fields.CharField(max_length=500, null=True)
+    # 渲染输出目录
+    renders_dir = fields.CharField(max_length=500, null=True)
+    # 缩略图目录
+    thumbnails_dir = fields.CharField(max_length=500, null=True)
     # 渲染引擎
     render_engine = fields.CharEnumField(RenderEngine, max_length=20)
     # 引擎配置

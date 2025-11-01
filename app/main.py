@@ -31,8 +31,7 @@ async def lifespan(app: FastAPI):
     await Tortoise.generate_schemas()
 
     print("数据库初始化完成")
-    print(f"渲染输出目录: {settings.render_output_dir}")
-    print(f"缩略图目录: {settings.thumbnail_dir}")
+    print(f"工作空间根目录: {settings.workspace_root_dir}")
 
     yield
 
