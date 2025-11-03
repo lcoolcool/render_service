@@ -1,0 +1,317 @@
+{
+  "analyse_time": "95",
+  "argument_info": {
+    "argument_json": "C:/Users/Administrator/AppData/Local/Temp/Renderbus/projects/1G219682760/argument.json",
+    "client_setting": {
+      "auto_download": true,
+      "build": "Build 2025-08-25",
+      "client": "Renderbus",
+      "client_cmd": "rendercmd.exe",
+      "client_inst_path": "Y:/SoftWare/Rayvision/Renderbus5.0",
+      "client_project_dir": "C:/RenderFarm/Project/219682760",
+      "date_time": "2025-10-18 22:11:11",
+      "ip": "192.168.99.106",
+      "language": 0,
+      "login_name": "Administrator",
+      "mac": "04:42:1A:ED:CA:D9",
+      "mode": "normal",
+      "os": "Windows 10(10.0.17763)",
+      "param_set_enabled": true,
+      "status": "1",
+      "system_locale": "zh_CN",
+      "tmp_path": "C:/Users/Administrator/AppData/Local/Temp/Renderbus/projects/1G219682760",
+      "transmit_engine": "RaySyncProxy",
+      "transmit_line": "",
+      "user_keyvalue": "",
+      "version": "5.2.2.4"
+    },
+    "client_task_info": {
+      "cg_id": "2000",
+      "channel": "1",
+      "config_name": "2022-04",
+      "display_common_tiles": "1",
+      "distribute_node": "1",
+      "edit_name": "2022-04",
+      "enable_layered": "1",
+      "frames_per_task": "1",
+      "geo_node_dependency": "0",
+      "graphics_cards_num": "2",
+      "hardwareConfigIds": [
+        "418"
+      ],
+      "input_cg_file": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33.ma",
+      "input_project_path": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes",
+      "is_distribute_render": "0",
+      "is_layer_rendering": "1",
+      "is_picture": "1",
+      "job_id": "219682760",
+      "job_id_alias": "1G219682760",
+      "job_stop_time": "86400",
+      "locationoutput": "C:/RenderFarm/Download",
+      "pack_node_id": "0",
+      "platform": "21",
+      "pre_frames": "000",
+      "project_id": "1341572",
+      "project_name": "default",
+      "ram": "64",
+      "render_include_all_lights": "0",
+      "render_layer_type": "0",
+      "render_no": "",
+      "stop_after_test": "1",
+      "task_id": "219682760",
+      "task_stop_time": "0",
+      "tiles": "1",
+      "tiles_type": "strip",
+      "time_out": "43200"
+    },
+    "environment": "eyJBRFNLX0NMTV9XUEFEX1BST1hZX0NIRUNLIjoiRkFMU0UiLCJBTExVU0VSU1BST0ZJTEUiOiJDOlxcUHJvZ3JhbURhdGEiLCJBUFBEQVRBIjoiQzpcXFVzZXJzXFxBZG1pbmlzdHJhdG9yXFxBcHBEYXRhXFxSb2FtaW5nIiwiQ09NUFVURVJOQU1FIjoiREVTS1RPUC04RzA3NlFDIiwiQ29tU3BlYyI6IkM6XFxXaW5kb3dzXFxzeXN0ZW0zMlxcY21kLmV4ZSIsIkNvbW1vblByb2dyYW1GaWxlcyI6IkM6XFxQcm9ncmFtIEZpbGVzXFxDb21tb24gRmlsZXMiLCJDb21tb25Qcm9ncmFtRmlsZXMoeDg2KSI6IkM6XFxQcm9ncmFtIEZpbGVzICh4ODYpXFxDb21tb24gRmlsZXMiLCJDb21tb25Qcm9ncmFtVzY0MzIiOiJDOlxcUHJvZ3JhbSBGaWxlc1xcQ29tbW9uIEZpbGVzIiwiREVBRExJTkVfUEFUSCI6IkM6XFxQcm9ncmFtIEZpbGVzXFxUaGlua2JveFxcRGVhZGxpbmUxMFxcYmluIiwiRHJpdmVyRGF0YSI6IkM6XFxXaW5kb3dzXFxTeXN0ZW0zMlxcRHJpdmVyc1xcRHJpdmVyRGF0YSIsIkZQU19CUk9XU0VSX0FQUF9QUk9GSUxFX1NUUklORyI6IkludGVybmV0IEV4cGxvcmVyIiwiRlBTX0JST1dTRVJfVVNFUl9QUk9GSUxFX1NUUklORyI6IkRlZmF1bHQiLCJIT01FRFJJVkUiOiJDOiIsIkhPTUVQQVRIIjoiXFxVc2Vyc1xcQWRtaW5pc3RyYXRvciIsIklOVEVMX0RFVl9SRURJU1QiOiJDOlxcUHJvZ3JhbSBGaWxlcyAoeDg2KVxcQ29tbW9uIEZpbGVzXFxJbnRlbFxcU2hhcmVkIExpYnJhcmllc1xcIiwiTE9DQUxBUFBEQVRBIjoiQzpcXFVzZXJzXFxBZG1pbmlzdHJhdG9yXFxBcHBEYXRhXFxMb2NhbCIsIkxPR09OU0VSVkVSIjoiXFxcXERFU0tUT1AtOEcwNzZRQyIsIk1JQ19MRF9MSUJSQVJZX1BBVEgiOiJDOlxcUHJvZ3JhbSBGaWxlcyAoeDg2KVxcQ29tbW9uIEZpbGVzXFxJbnRlbFxcU2hhcmVkIExpYnJhcmllc1xcY29tcGlsZXJcXGxpYlxcbWljIiwiTlVNQkVSX09GX1BST0NFU1NPUlMiOiIyNCIsIk9TIjoiV2luZG93c19OVCIsIlBBVEhFWFQiOiIuQ09NOy5FWEU7LkJBVDsuQ01EOy5WQlM7LlZCRTsuSlM7LkpTRTsuV1NGOy5XU0g7Lk1TQyIsIlBST0NFU1NPUl9BUkNISVRFQ1RVUkUiOiJBTUQ2NCIsIlBST0NFU1NPUl9JREVOVElGSUVSIjoiQU1ENjQgRmFtaWx5IDIzIE1vZGVsIDExMyBTdGVwcGluZyAwLCBBdXRoZW50aWNBTUQiLCJQUk9DRVNTT1JfTEVWRUwiOiIyMyIsIlBST0NFU1NPUl9SRVZJU0lPTiI6IjcxMDAiLCJQU01vZHVsZVBhdGgiOiJDOlxcUHJvZ3JhbSBGaWxlc1xcV2luZG93c1Bvd2VyU2hlbGxcXE1vZHVsZXM7QzpcXFdpbmRvd3NcXHN5c3RlbTMyXFxXaW5kb3dzUG93ZXJTaGVsbFxcdjEuMFxcTW9kdWxlcyIsIlBVQkxJQyI6IkM6XFxVc2Vyc1xcUHVibGljIiwiUGF0aCI6IkM6XFxQcm9ncmFtIEZpbGVzICh4ODYpXFxDb21tb24gRmlsZXNcXEludGVsXFxTaGFyZWQgTGlicmFyaWVzXFxyZWRpc3RcXGludGVsNjRcXGNvbXBpbGVyO0M6XFxXaW5kb3dzXFxzeXN0ZW0zMjtDOlxcV2luZG93cztDOlxcV2luZG93c1xcU3lzdGVtMzJcXFdiZW07QzpcXFdpbmRvd3NcXFN5c3RlbTMyXFxXaW5kb3dzUG93ZXJTaGVsbFxcdjEuMFxcO0M6XFxXaW5kb3dzXFxTeXN0ZW0zMlxcT3BlblNTSFxcO0M6XFxQcm9ncmFtIEZpbGVzICh4ODYpXFxOVklESUEgQ29ycG9yYXRpb25cXFBoeXNYXFxDb21tb247QzpcXFdpbmRvd3NcXHN5c3RlbTMyXFxkb3dubGV2ZWw7QzpcXFVzZXJzXFxBZG1pbmlzdHJhdG9yXFxBcHBEYXRhXFxMb2NhbFxcTWljcm9zb2Z0XFxXaW5kb3dzQXBwczsiLCJQcm9ncmFtRGF0YSI6IkM6XFxQcm9ncmFtRGF0YSIsIlByb2dyYW1GaWxlcyI6IkM6XFxQcm9ncmFtIEZpbGVzIiwiUHJvZ3JhbUZpbGVzKHg4NikiOiJDOlxcUHJvZ3JhbSBGaWxlcyAoeDg2KSIsIlByb2dyYW1XNjQzMiI6IkM6XFxQcm9ncmFtIEZpbGVzIiwiU0VTU0lPTk5BTUUiOiJDb25zb2xlIiwiU3lzdGVtRHJpdmUiOiJDOiIsIlN5c3RlbVJvb3QiOiJDOlxcV2luZG93cyIsIlRFTVAiOiJDOlxcVXNlcnNcXEFETUlOSX4xXFxBcHBEYXRhXFxMb2NhbFxcVGVtcCIsIlRNUCI6IkM6XFxVc2Vyc1xcQURNSU5JfjFcXEFwcERhdGFcXExvY2FsXFxUZW1wIiwiVVNFUkRPTUFJTiI6IkRFU0tUT1AtOEcwNzZRQyIsIlVTRVJET01BSU5fUk9BTUlOR1BST0ZJTEUiOiJERVNLVE9QLThHMDc2UUMiLCJVU0VSTkFNRSI6IkFkbWluaXN0cmF0b3IiLCJVU0VSUFJPRklMRSI6IkM6XFxVc2Vyc1xcQWRtaW5pc3RyYXRvciIsIl9fQ09NUEFUX0xBWUVSIjoiRGV0ZWN0b3JzV2luOCIsIndpbmRpciI6IkM6XFxXaW5kb3dzIn0=",
+    "is_debug": true,
+    "plugin_setting": {
+      "cg_id": 2000,
+      "cg_name": "Maya",
+      "cg_version": "2024",
+      "config_name": "2022-04",
+      "edit_name": "2022-04",
+      "os_name": 1,
+      "project_dir": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes",
+      "project_id": 1341572,
+      "project_name": "default",
+      "project_output": "C:/RenderFarm/Download",
+      "render_include_all_lights": 0,
+      "render_layer_type": 0,
+      "software_config": {
+        "cg_inst_dir": "C:/Program Files/Autodesk/Maya2022/bin",
+        "cg_name": "Maya",
+        "cg_version": "2024",
+        "os_name": "1",
+        "plugins": {
+          "mtoa": "5.5.1"
+        }
+      }
+    },
+    "render_setting": {
+      "assfileSwitchFlag": 0,
+      "ignoreAnalyseWarn": 0,
+      "ignoreMapFlag": 0,
+      "justUploadCgFlag": 0,
+      "justUploadConfigFlag": 0,
+      "mandatoryAnalyseAllAgent": 0,
+      "manuallyStartAnalysisFlag": 0,
+      "maxIgnoreMapFlag": 1,
+      "mifileSwitchFlag": 0
+    },
+    "user_setting": {
+      "acount_type": 1,
+      "parent_id": 0,
+      "shareMainCapital": false,
+      "user_id": 101044736,
+      "user_name": "Shengshu",
+      "zone": 1
+    },
+    "version": 0
+  },
+  "arnold_info": [
+    {
+      "Camera": "7",
+      "Diffuse": "5",
+      "Specular": "5",
+      "Sss": "3",
+      "Transmission": "3",
+      "Volume Indirect": "2",
+      "height": "1152",
+      "width": "2048"
+    }
+  ],
+  "env": {},
+  "layers": [
+    "defaultRenderLayer"
+  ],
+  "renderSetupLayer": [],
+  "scene_info": {
+    "defaultRenderLayer": {
+      "common": {
+        "all_camera": [
+          "cameraShape1",
+          "frontShape",
+          "leftShape",
+          "perspShape",
+          "perspShape1",
+          "sideShape",
+          "topShape"
+        ],
+        "animation": "True",
+        "by_frame": "1",
+        "end": "3",
+        "frames": "1-3[1]",
+        "height": "1152",
+        "image_file_prefix": "wolf_v32/wolf_v32",
+        "image_format": "exr",
+        "render_camera": [
+          "cameraShape1"
+        ],
+        "renderer": "arnold",
+        "renumber_frames": "False",
+        "start": "1",
+        "width": "2048"
+      },
+      "is_deep_output": "",
+      "is_default_camera": "1",
+      "layer_type": "0",
+      "option": {
+        "abortOnLicenseFail": "False",
+        "abort_on_error": "True",
+        "absolute_procedural_paths": "True",
+        "absolute_texture_paths": "True",
+        "aov_output_mode": "2",
+        "append": "False",
+        "auto_tx": "False",
+        "log_verbosity": "1",
+        "merge_aovs": "False",
+        "motion_blur_enable": "False",
+        "post_render_frame_mel": "",
+        "post_render_layer_mel": "",
+        "post_render_mel": "",
+        "pre_render_frame_mel": "",
+        "pre_render_layer_mel": "",
+        "pre_render_mel": "",
+        "render_type": "0",
+        "sampling": [
+          "7",
+          "5",
+          "5",
+          "3",
+          "3",
+          "2"
+        ],
+        "skipLicenseCheck": "False",
+        "textureMaxMemoryMB": "4096.0",
+        "threads_autodetect": "True",
+        "tiled": "True",
+        "use_existing_tiled_textures": "False"
+      },
+      "renderable": "1"
+    }
+  },
+  "scene_info_render": {
+    "defaultRenderLayer": {
+      "common": {
+        "all_camera": [
+          "cameraShape1",
+          "frontShape",
+          "leftShape",
+          "perspShape",
+          "perspShape1",
+          "sideShape",
+          "topShape"
+        ],
+        "animation": "True",
+        "by_frame": "1",
+        "end": "3",
+        "frames": "1-3[1]",
+        "frames_per_task": "1",
+        "height": "1152",
+        "image_file_prefix": "wolf_v32/wolf_v32",
+        "image_format": "exr",
+        "pre_frames": "100",
+        "render_camera": [
+          "cameraShape1"
+        ],
+        "renderer": "arnold",
+        "renumber_frames": "False",
+        "start": "1",
+        "test_frames": "100",
+        "tiles": "1",
+        "width": "2048"
+      },
+      "is_deep_output": "",
+      "is_default_camera": "1",
+      "layer_type": "0",
+      "option": {
+        "abortOnLicenseFail": "False",
+        "abort_on_error": "True",
+        "absolute_procedural_paths": "True",
+        "absolute_texture_paths": "True",
+        "aov_output_mode": "2",
+        "append": "False",
+        "auto_tx": "False",
+        "log_verbosity": "1",
+        "merge_aovs": "False",
+        "motion_blur_enable": "False",
+        "post_render_frame_mel": "",
+        "post_render_layer_mel": "",
+        "post_render_mel": "",
+        "pre_render_frame_mel": "",
+        "pre_render_layer_mel": "",
+        "pre_render_mel": "",
+        "render_type": "0",
+        "sampling": [
+          "7",
+          "5",
+          "5",
+          "3",
+          "3",
+          "2"
+        ],
+        "skipLicenseCheck": "False",
+        "textureMaxMemoryMB": "4096.0",
+        "threads_autodetect": "True",
+        "tiled": "True",
+        "use_existing_tiled_textures": "False"
+      },
+      "renderable": "1"
+    }
+  },
+  "software_config": {
+    "cg_inst_dir": "C:/Program Files/Autodesk/Maya2022/bin",
+    "cg_name": "Maya",
+    "cg_version": "2024",
+    "os_name": "1",
+    "plugins": {
+      "mtoa": "5.5.1"
+    },
+    "renderbus_client_version": "5.2.2.4"
+  },
+  "task_info": {
+    "additional": "0",
+    "cg_id": "2000",
+    "channel": "1",
+    "config_name": "2022-04",
+    "display_common_tiles": "1",
+    "distribute_node": "1",
+    "edit_name": "2022-04",
+    "enable_layered": "1",
+    "evaluation_mode": "parallel",
+    "frames_per_task": "1",
+    "geo_node_dependency": "0",
+    "gpu_render": 0,
+    "graphics_cards_num": "2",
+    "hardwareConfigIds": [
+      "418"
+    ],
+    "input_cg_file": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33.ma",
+    "input_project_path": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes",
+    "is_distribute_render": "0",
+    "is_layer_rendering": "1",
+    "is_picture": "1",
+    "job_id": "219682760",
+    "job_id_alias": "1G219682760",
+    "job_stop_time": "86400",
+    "locationoutput": "C:/RenderFarm/Download",
+    "pack_node_id": "0",
+    "platform": "21",
+    "pre_frames": "100",
+    "project_id": "1341572",
+    "project_name": "default",
+    "ram": "64",
+    "render_include_all_lights": "0",
+    "render_layer_type": "0",
+    "render_no": "",
+    "scene_project_path": "C:/Users/Administrator/Documents/maya/projects/default",
+    "stop_after_test": "1",
+    "task_id": "219682760",
+    "task_stop_time": "0",
+    "tiles": "1",
+    "tiles_type": "strip",
+    "time_out": "43200"
+  }
+}

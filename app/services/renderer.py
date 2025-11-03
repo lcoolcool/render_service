@@ -129,18 +129,47 @@ class MayaRenderer(BaseRenderer):
             return Path(matches[-1].strip())
 
         # 如果无法从输出解析，尝试在输出目录中查找
-        # 常见的Maya输出文件名格式：<scenename>.<frame>.<ext>
-        frame_str = f"{frame_number:04d}"  # 补齐到4位数字
+        # Maya的文件扩展名位置可能不固定，需要支持多种格式：
+        # - scene.0001.exr （扩展名在最后）
+        # - scene.exr.0001 （扩展名在中间）
+        # - scene_0001.exr （下划线分隔）
 
-        for ext in ['.exr', '.png', '.jpg', '.jpeg', '.tif']:
-            # 尝试多种可能的文件名格式
-            possible_files = list(output_dir.glob(f"*{frame_str}{ext}"))
-            if possible_files:
-                return possible_files[0]
+        frame_str_4 = f"{frame_number:04d}"  # 4位补齐
+        frame_str_no_pad = str(frame_number)  # 不补齐
 
-            possible_files = list(output_dir.glob(f"*.{frame_number}{ext}"))
-            if possible_files:
-                return possible_files[0]
+        supported_exts = ['.exr', '.png', '.jpg', '.jpeg', '.tif', '.tiff']
+
+        # 策略1：查找所有可能包含帧号的文件
+        search_patterns = [
+            f"*{frame_str_4}*",  # 包含4位帧号
+            f"*{frame_str_no_pad}.*",  # 包含不补齐的帧号
+            f"*_{frame_str_4}*",  # 下划线分隔
+            f"*.{frame_str_4}.*",  # 点分隔
+        ]
+
+        candidates = []
+        for pattern in search_patterns:
+            candidates.extend(output_dir.glob(pattern))
+
+        # 策略2：从候选文件中筛选出有效的图片文件
+        for candidate in candidates:
+            # 检查文件是否包含支持的扩展名（可能在任意位置）
+            file_name_lower = candidate.name.lower()
+            if any(ext in file_name_lower for ext in supported_exts):
+                # 验证文件确实包含正确的帧号
+                if frame_str_4 in candidate.name or frame_str_no_pad in candidate.name:
+                    return candidate
+
+        # 策略3：如果还是找不到，尝试最新修改的图片文件（作为兜底方案）
+        all_image_files = []
+        for ext in supported_exts:
+            all_image_files.extend(output_dir.glob(f"*{ext}"))
+            all_image_files.extend(output_dir.glob(f"*{ext}.*"))
+
+        if all_image_files:
+            # 按修改时间排序，返回最新的
+            all_image_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+            return all_image_files[0]
 
         return None
 
