@@ -39,37 +39,6 @@ async def download_render_output(frame_id: int):
     )
 
 
-@router.get("/thumbnail/{frame_id}", summary="获取缩略图")
-async def get_thumbnail(frame_id: int):
-    """
-    获取指定帧的缩略图
-
-    - **frame_id**: 渲染帧ID
-    """
-    # 获取帧信息
-    frame = await RenderFrame.get_or_none(id=frame_id)
-
-    if not frame:
-        raise HTTPException(status_code=404, detail=f"渲染帧不存在: {frame_id}")
-
-    if not frame.thumbnail_path:
-        raise HTTPException(status_code=404, detail="该帧还没有缩略图")
-
-    thumbnail_path = Path(frame.thumbnail_path)
-
-    if not thumbnail_path.exists():
-        raise HTTPException(status_code=404, detail="缩略图文件不存在")
-
-    # 返回图片文件
-    return FileResponse(
-        path=str(thumbnail_path),
-        media_type="image/jpeg",
-        headers={
-            "Cache-Control": "public, max-age=86400"  # 缓存1天
-        }
-    )
-
-
 @router.get("/preview/{frame_id}", summary="在线预览渲染结果")
 async def preview_render_output(frame_id: int):
     """

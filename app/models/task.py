@@ -26,7 +26,9 @@ class RenderTask(Model):
     # 用户ID
     unionid = fields.CharField(max_length=255)
     # OSS文件路径（原始存储位置）
-    oss_file_path = fields.CharField(max_length=500)
+    oss_file_path = fields.CharField(max_length=500, null=True)
+    # 本地文件路径（直接使用本地文件，无需从OSS下载）
+    file_path = fields.CharField(max_length=500, null=True)
     # 是否为压缩文件
     is_compressed = fields.BooleanField(default=False)
     # 本地工程文件路径（解压后用于渲染）
@@ -35,8 +37,6 @@ class RenderTask(Model):
     workspace_dir = fields.CharField(max_length=500, null=True)
     # 渲染输出目录
     renders_dir = fields.CharField(max_length=500, null=True)
-    # 缩略图目录
-    thumbnails_dir = fields.CharField(max_length=500, null=True)
     # 渲染引擎
     render_engine = fields.CharEnumField(RenderEngine, max_length=20)
     # 引擎配置

@@ -8,13 +8,21 @@ from app.models.task import TaskStatus, RenderEngine
 class TaskCreate(BaseModel):
     """创建任务的请求模型"""
     unionid: str = Field(..., description="用户ID")
-    oss_file_path: str = Field(..., description="OSS上的工程文件路径")
+    oss_file_path: Optional[str] = Field(default=None, description="OSS上的工程文件路径")
+    file_path: Optional[str] = Field(default=None, description="本地工程文件路径")
     is_compressed: bool = Field(default=False, description="文件是否为压缩格式 (支持.gz, .zip)")
     render_engine: RenderEngine = Field(..., description="渲染引擎类型 (maya/ue)")
     render_engine_conf: dict = Field(default_factory=dict, description="渲染引擎配置 (例如: Maya的renderer类型、UE的分辨率等)")
     priority: int = Field(default=5, ge=0, le=10, description="任务优先级 (0-10)")
     total_frames: int = Field(..., gt=0, description="总帧数")
     max_retries: int = Field(default=3, ge=0, description="最大重试次数")
+
+    def model_post_init(self, __context):
+        """验证必须提供 oss_file_path 或 file_path 其中之一"""
+        if not self.oss_file_path and not self.file_path:
+            raise ValueError("必须提供 oss_file_path 或 file_path 其中之一")
+        if self.oss_file_path and self.file_path:
+            raise ValueError("只能提供 oss_file_path 或 file_path 其中之一，不能同时提供")
 
     class Config:
         json_schema_extra = {
@@ -38,7 +46,8 @@ class TaskResponse(BaseModel):
     """任务响应模型"""
     id: int
     unionid: str
-    oss_file_path: str
+    oss_file_path: Optional[str]  # OSS文件路径
+    file_path: Optional[str]  # 本地文件路径
     is_compressed: bool
     project_file: Optional[str]  # 本地工程文件路径（下载解压后）
     workspace_dir: Optional[str]  # 任务工作空间目录

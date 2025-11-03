@@ -22,29 +22,160 @@ class FilePreparationService:
         self,
         unionid: str,
         task_id: int,
+        oss_file_path: Optional[str],
+        file_path: Optional[str],
+        is_compressed: bool,
+        render_engine: RenderEngine
+    ) -> Tuple[Path, Path, Path]:
+        """
+        准备渲染工程文件（完整流程）
+
+        流程:
+        - 如果提供了file_path（本地文件），直接使用本地文件
+        - 如果提供了oss_file_path（OSS文件），则：
+          1. 创建任务隔离的工作空间目录
+          2. 从OSS下载文件到 source/ 目录
+          3. 如果是压缩文件，解压到 project/ 目录
+          4. 查找工程文件路径
+          5. 返回工程文件路径、工作空间路径和渲染输出目录
+
+        Args:
+            unionid: 用户ID（用于目录隔离）
+            task_id: 任务ID（用于目录隔离）
+            oss_file_path: OSS文件路径（可选）
+            file_path: 本地文件路径（可选）
+            is_compressed: 是否为压缩文件
+            render_engine: 渲染引擎类型（用于确定工程文件扩展名）
+
+        Returns:
+            (工程文件路径, 工作空间目录路径, 渲染输出目录)
+
+        Raises:
+            FileNotFoundError: 文件下载或查找失败
+            ValueError: 解压失败或不支持的格式
+        """
+        # 使用本地文件
+        if file_path:
+            return self._prepare_local_file(unionid, task_id, file_path, is_compressed, render_engine)
+        # 使用OSS文件
+        elif oss_file_path:
+            return self._prepare_oss_file(unionid, task_id, oss_file_path, is_compressed, render_engine)
+        else:
+            raise ValueError("必须提供 oss_file_path 或 file_path 其中之一")
+
+    def _prepare_local_file(
+        self,
+        unionid: str,
+        task_id: int,
+        file_path: str,
+        is_compressed: bool,
+        render_engine: RenderEngine
+    ) -> Tuple[Path, Path, Path]:
+        """
+        准备本地文件（无需从OSS下载）
+
+        流程:
+        1. 创建任务隔离的工作空间目录
+        2. 如果是压缩文件，复制到source目录并解压到project目录
+        3. 如果不是压缩文件，复制到project目录
+        4. 查找工程文件路径
+        5. 返回工程文件路径、工作空间路径和渲染输出目录
+
+        Args:
+            unionid: 用户ID
+            task_id: 任务ID
+            file_path: 本地文件路径
+            is_compressed: 是否为压缩文件
+            render_engine: 渲染引擎类型
+
+        Returns:
+            (工程文件路径, 工作空间目录路径, 渲染输出目录)
+
+        Raises:
+            FileNotFoundError: 文件不存在或查找失败
+            ValueError: 解压失败或不支持的格式
+        """
+        try:
+            # 验证本地文件是否存在
+            local_file = Path(file_path)
+            if not local_file.exists():
+                raise FileNotFoundError(f"本地文件不存在: {file_path}")
+
+            # 1. 创建工作空间目录结构
+            workspace_dir = self._create_workspace(unionid, task_id)
+            source_dir = workspace_dir / "source"
+            project_dir = workspace_dir / "project"
+            renders_dir = workspace_dir / "renders"
+
+            source_dir.mkdir(parents=True, exist_ok=True)
+            project_dir.mkdir(parents=True, exist_ok=True)
+            renders_dir.mkdir(parents=True, exist_ok=True)
+
+            logger.info(f"创建工作空间: {workspace_dir}")
+            logger.info(f"使用本地文件: {file_path}")
+
+            # 2. 处理压缩文件
+            if is_compressed:
+                # 复制到source目录
+                copied_file = source_dir / local_file.name
+                shutil.copy2(str(local_file), str(copied_file))
+                logger.info(f"文件为压缩格式，已复制到source目录，开始解压...")
+
+                # 解压到project目录
+                self.file_handler.decompress_file(
+                    compressed_file=copied_file,
+                    output_dir=project_dir,
+                    delete_after=False  # 保留原压缩文件
+                )
+            else:
+                # 非压缩文件，直接复制到project目录
+                logger.info(f"文件无需解压，直接复制")
+                shutil.copy2(str(local_file), str(project_dir / local_file.name))
+
+            # 3. 查找工程文件
+            project_file = self._find_project_file(project_dir, render_engine)
+            if not project_file:
+                raise FileNotFoundError(
+                    f"在 {project_dir} 中未找到有效的工程文件"
+                )
+
+            logger.info(f"文件准备完成: {project_file}")
+            return project_file, workspace_dir, renders_dir
+
+        except Exception as e:
+            logger.error(f"本地文件准备失败: {e}")
+            # 清理失败的工作空间
+            if 'workspace_dir' in locals():
+                self.cleanup_workspace(workspace_dir)
+            raise
+
+    def _prepare_oss_file(
+        self,
+        unionid: str,
+        task_id: int,
         oss_file_path: str,
         is_compressed: bool,
         render_engine: RenderEngine
-    ) -> Tuple[Path, Path, Path, Path]:
+    ) -> Tuple[Path, Path, Path]:
         """
-        准备渲染工程文件（完整流程）
+        准备OSS文件（原有逻辑）
 
         流程:
         1. 创建任务隔离的工作空间目录
         2. 从OSS下载文件到 source/ 目录
         3. 如果是压缩文件，解压到 project/ 目录
         4. 查找工程文件路径
-        5. 返回工程文件路径、工作空间路径、渲染输出目录和缩略图目录
+        5. 返回工程文件路径、工作空间路径和渲染输出目录
 
         Args:
-            unionid: 用户ID（用于目录隔离）
-            task_id: 任务ID（用于目录隔离）
+            unionid: 用户ID
+            task_id: 任务ID
             oss_file_path: OSS文件路径
             is_compressed: 是否为压缩文件
-            render_engine: 渲染引擎类型（用于确定工程文件扩展名）
+            render_engine: 渲染引擎类型
 
         Returns:
-            (工程文件路径, 工作空间目录路径, 渲染输出目录, 缩略图目录)
+            (工程文件路径, 工作空间目录路径, 渲染输出目录)
 
         Raises:
             FileNotFoundError: 文件下载或查找失败
@@ -56,12 +187,10 @@ class FilePreparationService:
             source_dir = workspace_dir / "source"
             project_dir = workspace_dir / "project"
             renders_dir = workspace_dir / "renders"
-            thumbnails_dir = workspace_dir / "thumbnails"
 
             source_dir.mkdir(parents=True, exist_ok=True)
             project_dir.mkdir(parents=True, exist_ok=True)
             renders_dir.mkdir(parents=True, exist_ok=True)
-            thumbnails_dir.mkdir(parents=True, exist_ok=True)
 
             logger.info(f"创建工作空间: {workspace_dir}")
 
@@ -96,7 +225,7 @@ class FilePreparationService:
                 )
 
             logger.info(f"文件准备完成: {project_file}")
-            return project_file, workspace_dir, renders_dir, thumbnails_dir
+            return project_file, workspace_dir, renders_dir
 
         except Exception as e:
             logger.error(f"文件准备失败: {e}")
@@ -115,8 +244,7 @@ class FilePreparationService:
               └── {task_id}/
                   ├── source/       # OSS下载的原始文件
                   ├── project/      # 解压后的工程文件
-                  ├── renders/      # 渲染输出文件
-                  └── thumbnails/   # 缩略图文件
+                  └── renders/      # 渲染输出文件
 
         Args:
             unionid: 用户ID

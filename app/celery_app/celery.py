@@ -38,9 +38,6 @@ celery_app.conf.update(
         "app.celery_app.tasks.render_task": {
             "queue": "default",
         },
-        "app.celery_app.tasks.generate_thumbnail": {
-            "queue": "low_priority",
-        },
     },
 
     # 任务重试配置

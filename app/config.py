@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
     # 文件存储配置
     upload_dir: Path = Path("C:/uploads")
-    workspace_root_dir: Path = Path("C:/workspace")  # 任务工作空间根目录（包含所有任务的source、project、renders、thumbnails）
+    workspace_root_dir: Path = Path("C:/workspace")  # 任务工作空间根目录（包含所有任务的source、project、renders）
 
     # 阿里云OSS配置
     oss_endpoint: str = "oss-cn-hangzhou.aliyuncs.com"  # OSS访问域名
@@ -36,7 +36,6 @@ class Settings(BaseSettings):
     # 任务配置
     max_retries: int = 3
     default_priority: int = 5
-    thumbnail_size: int = 200
 
     # API配置
     api_host: str = "0.0.0.0"

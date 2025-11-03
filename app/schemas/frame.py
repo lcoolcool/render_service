@@ -11,7 +11,6 @@ class FrameResponse(BaseModel):
     frame_number: int
     status: str
     output_path: Optional[str]
-    thumbnail_path: Optional[str]
     render_time: Optional[float]
     error_message: Optional[str]
     created_at: datetime

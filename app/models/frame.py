@@ -24,8 +24,6 @@ class RenderFrame(Model):
     status = fields.CharEnumField(FrameStatus, max_length=20, default=FrameStatus.PENDING)
     # 渲染结果文件路径
     output_path = fields.CharField(max_length=500, null=True)
-    # 缩略图路径
-    thumbnail_path = fields.CharField(max_length=500, null=True)
     # 渲染耗时（秒）
     render_time = fields.FloatField(null=True)
     # 错误信息

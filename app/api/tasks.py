@@ -17,7 +17,8 @@ async def create_task(task_data: TaskCreate):
     创建新的渲染任务
 
     - **unionid**: 用户ID
-    - **oss_file_path**: OSS上的工程文件路径
+    - **oss_file_path**: OSS上的工程文件路径（与file_path二选一）
+    - **file_path**: 本地工程文件路径（与oss_file_path二选一）
     - **is_compressed**: 文件是否为压缩格式
     - **render_engine**: 渲染引擎（maya/ue）
     - **render_engine_conf**: 渲染引擎配置
@@ -30,6 +31,7 @@ async def create_task(task_data: TaskCreate):
         task = await RenderTask.create(
             unionid=task_data.unionid,
             oss_file_path=task_data.oss_file_path,
+            file_path=task_data.file_path,
             is_compressed=task_data.is_compressed,
             render_engine=task_data.render_engine,
             render_engine_conf=task_data.render_engine_conf,
@@ -74,6 +76,7 @@ async def create_task(task_data: TaskCreate):
             id=task.id,
             unionid=task.unionid,
             oss_file_path=task.oss_file_path,
+            file_path=task.file_path,
             is_compressed=task.is_compressed,
             project_file=task.project_file,
             workspace_dir=task.workspace_dir,
@@ -108,6 +111,7 @@ async def get_task(task_id: int):
         id=task.id,
         unionid=task.unionid,
         oss_file_path=task.oss_file_path,
+        file_path=task.file_path,
         is_compressed=task.is_compressed,
         project_file=task.project_file,
         workspace_dir=task.workspace_dir,
@@ -174,6 +178,7 @@ async def list_tasks(
             id=task.id,
             unionid=task.unionid,
             oss_file_path=task.oss_file_path,
+            file_path=task.file_path,
             is_compressed=task.is_compressed,
             project_file=task.project_file,
             workspace_dir=task.workspace_dir,
@@ -235,7 +240,6 @@ async def get_task_frames(
             frame_number=frame.frame_number,
             status=frame.status.value,
             output_path=frame.output_path,
-            thumbnail_path=frame.thumbnail_path,
             render_time=frame.render_time,
             error_message=frame.error_message,
             created_at=frame.created_at,
@@ -302,7 +306,7 @@ async def cleanup_task_workspace(task_id: int):
     """
     清理指定任务的工作空间
 
-    - 删除工作空间目录及所有文件（包括source、project、renders、thumbnails）
+    - 删除工作空间目录及所有文件（包括source、project、renders）
     - 只能清理已完成、失败或已取消的任务
     - 正在运行的任务无法清理
     """
