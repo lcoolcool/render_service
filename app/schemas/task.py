@@ -1,5 +1,5 @@
 """任务相关的Pydantic schemas"""
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from pydantic import BaseModel, Field
 from app.models.task import TaskStatus, RenderEngine
@@ -13,9 +13,7 @@ class TaskCreate(BaseModel):
     is_compressed: bool = Field(default=False, description="文件是否为压缩格式 (支持.gz, .zip)")
     render_engine: RenderEngine = Field(..., description="渲染引擎类型 (maya/ue)")
     render_engine_conf: dict = Field(default_factory=dict, description="渲染引擎配置 (例如: Maya的renderer类型、UE的分辨率等)")
-    priority: int = Field(default=5, ge=0, le=10, description="任务优先级 (0-10)")
     total_frames: int = Field(..., gt=0, description="总帧数")
-    max_retries: int = Field(default=3, ge=0, description="最大重试次数")
 
     def model_post_init(self, __context):
         """验证必须提供 oss_file_path 或 file_path 其中之一"""
@@ -35,9 +33,7 @@ class TaskCreate(BaseModel):
                     "renderer": "arnold",
                     "quality": "high"
                 },
-                "priority": 7,
-                "total_frames": 100,
-                "max_retries": 3
+                "total_frames": 100
             }
         }
 
@@ -54,12 +50,11 @@ class TaskResponse(BaseModel):
     render_engine: str
     render_engine_conf: dict
     status: str
-    priority: int
     total_frames: int
     completed_frames: int
     progress_percentage: float
-    retry_count: int
-    max_retries: int
+    is_deleted: bool
+    p_date: Optional[date]
     celery_task_id: Optional[str]
     error_message: Optional[str]
     created_at: datetime

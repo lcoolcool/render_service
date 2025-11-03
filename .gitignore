@@ -41,6 +41,7 @@ uv.lock
 # 数据库
 *.sqlite3
 *.db
+*.sqlite3-*
 
 # 环境变量
 .env

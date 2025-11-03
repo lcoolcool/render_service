@@ -33,10 +33,6 @@ class Settings(BaseSettings):
     maya_executable: Path = Path("C:/Program Files/Autodesk/Maya2022/bin/Render.exe")
     ue_executable: Path = Path("C:/Program Files/Epic Games/UE_5.3/Engine/Binaries/Win64/UnrealEditor-Cmd.exe")
 
-    # 任务配置
-    max_retries: int = 3
-    default_priority: int = 5
-
     # API配置
     api_host: str = "0.0.0.0"
     api_port: int = 8000

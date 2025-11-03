@@ -108,6 +108,7 @@ def render_task(self, task_id: int):
 
         # 逐帧渲染
         for frame in frames:
+            logger.info(f'任务 {task_id}, Frame {frame.id} Start Run' )
             # 再次检查是否被取消
             task = loop.run_until_complete(RenderTask.get(id=task_id))
             if task.status == TaskStatus.CANCELLED:
@@ -196,9 +197,7 @@ def render_task(self, task_id: int):
 @celery_app.task(
     bind=True,
     base=DatabaseTask,
-    name="app.celery_app.tasks.retry_render_frame",
-    max_retries=3,
-    default_retry_delay=60
+    name="app.celery_app.tasks.retry_render_frame"
 )
 def retry_render_frame(self, task_id: int, frame_number: int):
     """
@@ -283,10 +282,6 @@ def retry_render_frame(self, task_id: int, frame_number: int):
         frame.error_message = str(e)
         loop.run_until_complete(frame.save())
 
-        # 如果还有重试次数，继续重试
-        if self.request.retries < self.max_retries:
-            logger.info(f"将在60秒后重试（第 {self.request.retries + 1}/{self.max_retries} 次）")
-            raise self.retry(exc=e, countdown=60)
-        else:
-            logger.error(f"达到最大重试次数，放弃渲染帧 {frame_number}")
-            raise
+        # 不再自动重试，需要用户手动调用重试接口
+        logger.error(f"渲染帧 {frame_number} 失败，请手动重试")
+        raise

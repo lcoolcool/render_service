@@ -43,16 +43,14 @@ class RenderTask(Model):
     render_engine_conf = fields.JSONField(default=dict)
     # 任务状态
     status = fields.CharEnumField(TaskStatus, max_length=20, default=TaskStatus.PENDING)
-    # 优先级 (0-10, 数字越大优先级越高)
-    priority = fields.IntField(default=5)
     # 总帧数
     total_frames = fields.IntField(default=0)
     # 已完成帧数
     completed_frames = fields.IntField(default=0)
-    # 重试次数
-    retry_count = fields.IntField(default=0)
-    # 最大重试次数
-    max_retries = fields.IntField(default=3)
+    # 是否已删除（软删除）
+    is_deleted = fields.BooleanField(default=False)
+    # 分区日期（用于数据分区管理，自动获取创建日期）
+    p_date = fields.DateField(auto_now_add=True, index=True)
     # Celery任务ID（用于取消任务）
     celery_task_id = fields.CharField(max_length=255, null=True)
     # 错误信息
@@ -66,7 +64,7 @@ class RenderTask(Model):
 
     class Meta:
         table = "render_tasks"
-        ordering = ["-priority", "-created_at"]  # 优先级高的在前，创建时间晚的在前
+        ordering = ["-created_at"]  # 创建时间晚的在前
 
     def __str__(self):
         return f"RenderTask({self.id}, {self.render_engine}, {self.status})"

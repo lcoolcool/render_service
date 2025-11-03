@@ -22,9 +22,7 @@ async def create_task(task_data: TaskCreate):
     - **is_compressed**: 文件是否为压缩格式
     - **render_engine**: 渲染引擎（maya/ue）
     - **render_engine_conf**: 渲染引擎配置
-    - **priority**: 任务优先级（0-10）
     - **total_frames**: 总帧数
-    - **max_retries**: 最大重试次数
     """
     try:
         # 创建任务记录
@@ -35,9 +33,7 @@ async def create_task(task_data: TaskCreate):
             is_compressed=task_data.is_compressed,
             render_engine=task_data.render_engine,
             render_engine_conf=task_data.render_engine_conf,
-            priority=task_data.priority,
             total_frames=task_data.total_frames,
-            max_retries=task_data.max_retries,
             status=TaskStatus.PENDING
         )
 
@@ -52,19 +48,10 @@ async def create_task(task_data: TaskCreate):
         ]
         await RenderFrame.bulk_create([RenderFrame(**data) for data in frames_data])
 
-        # 根据优先级选择队列
-        if task_data.priority >= 8:
-            queue_name = "high_priority"
-        elif task_data.priority <= 3:
-            queue_name = "low_priority"
-        else:
-            queue_name = "default"
-
-        # 提交异步任务
-        # 注意：优先级通过队列区分，不需要传递priority参数
+        # 提交异步任务到默认队列
         celery_task = render_task.apply_async(
             args=[task.id],
-            queue=queue_name
+            queue="default"
         )
 
         # 更新celery_task_id
@@ -83,12 +70,11 @@ async def create_task(task_data: TaskCreate):
             render_engine=task.render_engine.value,
             render_engine_conf=task.render_engine_conf,
             status=task.status.value,
-            priority=task.priority,
             total_frames=task.total_frames,
             completed_frames=task.completed_frames,
             progress_percentage=task.progress_percentage,
-            retry_count=task.retry_count,
-            max_retries=task.max_retries,
+            is_deleted=task.is_deleted,
+            p_date=task.p_date,
             celery_task_id=task.celery_task_id,
             error_message=task.error_message,
             created_at=task.created_at,
@@ -118,12 +104,11 @@ async def get_task(task_id: int):
         render_engine=task.render_engine.value,
         render_engine_conf=task.render_engine_conf,
         status=task.status.value,
-        priority=task.priority,
         total_frames=task.total_frames,
         completed_frames=task.completed_frames,
         progress_percentage=task.progress_percentage,
-        retry_count=task.retry_count,
-        max_retries=task.max_retries,
+        is_deleted=task.is_deleted,
+        p_date=task.p_date,
         celery_task_id=task.celery_task_id,
         error_message=task.error_message,
         created_at=task.created_at,
@@ -185,12 +170,11 @@ async def list_tasks(
             render_engine=task.render_engine.value,
             render_engine_conf=task.render_engine_conf,
             status=task.status.value,
-            priority=task.priority,
             total_frames=task.total_frames,
             completed_frames=task.completed_frames,
             progress_percentage=task.progress_percentage,
-            retry_count=task.retry_count,
-            max_retries=task.max_retries,
+            is_deleted=task.is_deleted,
+            p_date=task.p_date,
             celery_task_id=task.celery_task_id,
             error_message=task.error_message,
             created_at=task.created_at,
