@@ -20,7 +20,6 @@ class Settings(BaseSettings):
     celery_result_backend: str = "redis://localhost:6379/1"
 
     # 文件存储配置
-    upload_dir: Path = Path("C:/uploads")
     workspace_root_dir: Path = Path("C:/workspace")  # 任务工作空间根目录（包含所有任务的source、project、renders）
 
     # 阿里云OSS配置
@@ -46,7 +45,6 @@ class Settings(BaseSettings):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # 确保必要的目录存在
-        self.upload_dir.mkdir(parents=True, exist_ok=True)
         self.workspace_root_dir.mkdir(parents=True, exist_ok=True)
 
 

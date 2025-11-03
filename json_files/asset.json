@@ -1,0 +1,484 @@
+{
+    "asset_num": 33,
+    "scene_file_size": 841968626,
+    "scene_file": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33.ma  (mtime 2025-07-28 18:19:54) size 841968626",
+    "asset_size": 23748328,
+    "asset": [
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/config.ocio  (mtime 2021-01-23 05:39:53) size 10429",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\config.ocio  (mtime 2021-01-23 05:39:53) size 10429",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_ACES.ctf  (mtime 2020-11-30 13:35:04) size 1595",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_CIE-XYZ_1.0.ctf  (mtime 2017-03-31 06:56:06) size 854297",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_CIE-XYZ_v0.7.ctf  (mtime 2017-03-31 06:56:06) size 1902075",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_sRGB_1.0.ctf  (mtime 2020-12-06 13:35:36) size 2531",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_sRGB_v0.7.ctf  (mtime 2020-12-06 13:35:36) size 2241",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACEScc_to_ACES2065-1.ctf  (mtime 2020-11-30 13:35:04) size 75620",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACEScg_to_ACES.ctf  (mtime 2020-11-30 13:35:04) size 1646",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ADX10_to_ACES.ctf  (mtime 2017-03-31 06:56:10) size 1050629",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Alexa-v3-LogC-EI800_no-cam-black_to_ACES.ctf  (mtime 2020-11-30 13:35:04) size 17005",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Bitsquid_tonemap.ctf  (mtime 2017-03-31 06:56:15) size 984515",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\CIE-XYZ_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1779",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\F65-SLog2_to_ACES_no-cam-black.ctf  (mtime 2020-11-30 13:35:05) size 62968",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Lin_to_Log--classic.ctf  (mtime 2020-11-30 13:35:05) size 1296",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\LinearP3-DCI_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1750",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\LinearRec709-sRGB_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1769",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\LinearUHDTV_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1762",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Log_to_Lin--classic.ctf  (mtime 2020-11-30 13:35:05) size 1309",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Log_to_Lin--jzp.ctf  (mtime 2020-11-30 13:35:05) size 1299",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\SharpRGB_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1641",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Unity_neutral_tonemap.ctf  (mtime 2020-11-30 13:35:05) size 788017",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\gamma_1.8_Rec709_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1634",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\gamma_2.2_Rec709_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1634",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\gamma_2.4_Rec709_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1658",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\raw.ctf  (mtime 2020-11-30 13:35:05) size 1461",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_Rec709-camera_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1680",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_gamma--1.8.ctf  (mtime 2020-11-30 13:35:05) size 1577",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_gamma--2.2.ctf  (mtime 2020-11-30 13:35:05) size 1577",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_gamma--Rec709.ctf  (mtime 2020-11-30 13:35:05) size 1616",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_gamma--sRGB.ctf  (mtime 2020-11-30 13:35:05) size 1613",
+        "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_sRGB_to_ACES.ctf  (mtime 2020-11-30 13:35:05) size 1622",
+        "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33__wolf_fur_v02.xgen  (mtime 2025-07-28 18:19:54) size 17955654"
+    ],
+    "missing": [
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_project_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/xgen"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${PROJECT}xgen/collections/wolf_fur_v02"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_groom/groom/width"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/Region"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/guides.abc"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_body_C01_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Points/b"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Maps"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_body/paintmaps/fur_body_density_C01_Mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_body_density_C01_Mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/groom/region"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_body_C02_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Points"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Maps"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_body_C02_noise"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "$h"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_body_C03_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Points"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Maps"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_body_noise_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "/100.0"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_body_density_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/Points"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_body_fur_body_density_C01_Mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_C01_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_C02_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_C02_noise.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_C03_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_density_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_neck_C01_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Points"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_neck_density_C01_Mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_neck_C02_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_neck_C03_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_neck_C03_noise"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_neck_noise_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_neck_density_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_C01_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_neck_fur_neck_density_C01_Mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_C02_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_C03_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_neck_fur_neck_C03_noise.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_density_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/groom/length"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/groom/width"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/groom/orient"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/groom/bend"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_legs/paintmaps/fur_backlegs_C01_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Points/bb"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_legs_density_C01_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_legs/paintmaps/fur_frontlegs_C01_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_legs/paintmaps/fur_backlegs_C02_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_frontlegs_C01mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_legs/paintmaps/fur_frontlegs_C02_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_legs/paintmaps/fur_backlegs_C03_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_legs/paintmaps/fur_frontlegs_C02_noise"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_frontlegs_C02_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_backlegs_C02_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "$nonStrayValu"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_legs/paintmaps/fur_frontlegs_density_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_legs/paintmaps/fur_backlegs_density_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_backlegs_fur_backlegs_C01_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_legs_fur_legs_density_C01_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_frontlegs_fur_frontlegs_C01mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_frontlegs_fur_frontlegs_C02mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_frontlegs_fur_frontlegs_C02_noise.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_frontlegs_fur_frontlegs_density_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "$ma"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_tail_density_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_tail_fur_tail_density_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "fur_of_headgm/groom/width"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_head_density_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_head_C01_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_head_C02_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_head_C03_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/${FXMODULE}/Points/b"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_head_C03_noise"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_head_density_C03_Mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_head_noise_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C01_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C02_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C03_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C03_noise.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_density_C03_Mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_face_fur_face_density_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_ear_C01_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_ear_C02_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "/n$nonStrayValu"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "${DESC}/paintmaps/fur_ear_density_mask"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_ear_fur_ear_C01_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_ear_fur_ear_C02_mask.iff"
+        },
+        {
+            "wolf_fur_refV33__wolf_fur_v02.xgen_xgen_procedural": "Y:/Render_Test/Arnold/wolf_xgen/Wolf/sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_ear_fur_ear_density_mask.iff"
+        },
+        {
+            "file1.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_density_mask.iff"
+        },
+        {
+            "file2.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_C01_mask.iff"
+        },
+        {
+            "file3.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_C02_mask.iff"
+        },
+        {
+            "file4.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_C03_mask.iff"
+        },
+        {
+            "file5.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_body_fur_body_C02_noise.iff"
+        },
+        {
+            "file6.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_density_mask.iff"
+        },
+        {
+            "file7.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_C01_mask.iff"
+        },
+        {
+            "file8.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_C02_mask.iff"
+        },
+        {
+            "file9.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_C03_mask.iff"
+        },
+        {
+            "file10.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_neck_fur_neck_noise_mask.iff"
+        },
+        {
+            "file13.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_frontlegs_fur_frontlegs_density_mask.iff"
+        },
+        {
+            "file14.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_frontlegs_fur_frontlegs_C01mask.iff"
+        },
+        {
+            "file15.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_frontlegs_fur_frontlegs_C02mask.iff"
+        },
+        {
+            "file16.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_frontlegs_fur_frontlegs_C02_noise.iff"
+        },
+        {
+            "file17.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_backlegs_fur_backlegs_C02_mask.iff"
+        },
+        {
+            "file19.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_backlegs_fur_backlegs_density_mask.iff"
+        },
+        {
+            "file20.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_backlegs_fur_backlegs_C01_mask.iff"
+        },
+        {
+            "file23.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_tail_fur_tail_density_mask.iff"
+        },
+        {
+            "file30.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_backlegs_fur_backlegs_C03_mask.iff"
+        },
+        {
+            "file34.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_body_fur_body_noise_mask.iff"
+        },
+        {
+            "file35.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_body_fur_body_density_C01_Mask.iff"
+        },
+        {
+            "file39.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_headgroom_region.iff"
+        },
+        {
+            "file40.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/Wolf_Groom_GeoShape_Wolf_fur_fur_face_fur_face_density_mask.iff"
+        },
+        {
+            "file41.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_neck_fur_neck_density_C01_Mask.iff"
+        },
+        {
+            "file42.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_legs_fur_legs_density_C01_mask.iff"
+        },
+        {
+            "file43.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C01_mask.iff"
+        },
+        {
+            "file44.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C02_mask.iff"
+        },
+        {
+            "file45.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C03_clump.iff"
+        },
+        {
+            "file46.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C03_mask.iff"
+        },
+        {
+            "file47.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_noise_mask.iff"
+        },
+        {
+            "file48.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_ear_fur_ear_density_mask.iff"
+        },
+        {
+            "file49.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_ear_fur_ear_C01_mask.iff"
+        },
+        {
+            "file50.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_ear_fur_ear_C02_mask.iff"
+        },
+        {
+            "file51.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_density_C03_Mask.iff"
+        },
+        {
+            "file53.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/wolf_EyeColor.tif"
+        },
+        {
+            "file54.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/wolf_tongue_col.tif"
+        },
+        {
+            "file55.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/wolf_tongue_rgh.tif"
+        },
+        {
+            "file56.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/wolf_tongue_bmp.tif"
+        },
+        {
+            "file57.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/nail_tooth_col.tif"
+        },
+        {
+            "file58.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/wolf_EyeSpec.tif"
+        },
+        {
+            "file59.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/nail_tooth_bmp.tif"
+        },
+        {
+            "file60.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/body_nor.tif"
+        },
+        {
+            "file61.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/body/wolf_body_Geov03_DefaultMaterial_BaseColor.tga"
+        },
+        {
+            "file64.computedFileTextureNamePattern": "D:/maya_proj/Wolf_new/Wolf//sourceimages/tex/body/wolf_body_Geov03_DefaultMaterial_Roughness.tga"
+        },
+        {
+            "file68.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_ear_fur_ear_noise_mask.iff"
+        },
+        {
+            "file73.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/fur/fur_root_basecol.tga"
+        },
+        {
+            "file74.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/fur/fur_mid_basecol.tga"
+        },
+        {
+            "file76.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/fur/fur_tip_basecol.tga"
+        },
+        {
+            "file77.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_head_GeoShape_wolf_fur_v02_fur_of_head_fur_head_C03_noise.iff"
+        },
+        {
+            "file78.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/3dPaintTextures/wolf_fur_refV33/wolf_fur_GeoShape_wolf_fur_v02_fur_of_neck_fur_neck_C03_noise.iff"
+        },
+        {
+            "file79.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/tex/wolf_tongue_sss.tif"
+        },
+        {
+            "file80.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/HDR_114_Forest_4_Ref.hdr"
+        },
+        {
+            "pasted__file31.computedFileTextureNamePattern": "Y:/Render_Test/Arnold/wolf_xgen/Wolf//sourceimages/fengjing_103.hdr"
+        }
+    ]
+}

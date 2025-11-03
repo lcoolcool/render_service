@@ -31,30 +31,24 @@ class RenderTask(Model):
     file_path = fields.CharField(max_length=500, null=True)
     # 是否为压缩文件
     is_compressed = fields.BooleanField(default=False)
-    # 本地工程文件路径（解压后用于渲染）
-    project_file = fields.CharField(max_length=500, null=True)
-    # 任务工作空间目录
-    workspace_dir = fields.CharField(max_length=500, null=True)
-    # 渲染输出目录
-    renders_dir = fields.CharField(max_length=500, null=True)
     # 渲染引擎
     render_engine = fields.CharEnumField(RenderEngine, max_length=20)
-    # 引擎配置
-    render_engine_conf = fields.JSONField(default=dict)
+    # 任务信息（包含执行任务所需的所有配置）
+    task_info = fields.JSONField(default=dict)
     # 任务状态
     status = fields.CharEnumField(TaskStatus, max_length=20, default=TaskStatus.PENDING)
     # 总帧数
     total_frames = fields.IntField(default=0)
     # 已完成帧数
     completed_frames = fields.IntField(default=0)
-    # 是否已删除（软删除）
-    is_deleted = fields.BooleanField(default=False)
-    # 分区日期（用于数据分区管理，自动获取创建日期）
-    p_date = fields.DateField(auto_now_add=True, index=True)
     # Celery任务ID（用于取消任务）
     celery_task_id = fields.CharField(max_length=255, null=True)
     # 错误信息
     error_message = fields.TextField(null=True)
+    # 是否已删除（软删除）
+    is_deleted = fields.BooleanField(default=False)
+    # 分区日期（用于数据分区管理，自动获取创建日期）
+    p_date = fields.DateField(auto_now_add=True, index=True, null=True)
     # 时间戳
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)

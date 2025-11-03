@@ -82,13 +82,14 @@ def render_task(self, task_id: int):
                 oss_file_path=task.oss_file_path,
                 file_path=task.file_path,
                 is_compressed=task.is_compressed,
-                render_engine=task.render_engine
+                render_engine=task.render_engine,
+                task_info=task.task_info
             )
 
-            # 更新任务的本地文件路径和工作空间
-            task.project_file = str(project_file)
-            task.workspace_dir = str(workspace_dir)
-            task.renders_dir = str(renders_dir)
+            # 将路径信息保存到 task_info 中
+            task.task_info["project_file"] = str(project_file)
+            task.task_info["workspace_dir"] = str(workspace_dir)
+            task.task_info["renders_dir"] = str(renders_dir)
             loop.run_until_complete(task.save())
 
         except Exception as e:
@@ -122,10 +123,10 @@ def render_task(self, task_id: int):
                 # 执行渲染
                 start_time = time.time()
                 output_path, stdout, stderr = renderer.render_frame(
-                    project_file=task.project_file,
+                    project_file=task.task_info.get("project_file"),
                     frame_number=frame.frame_number,
-                    output_dir=Path(task.renders_dir),
-                    engine_conf=task.render_engine_conf
+                    output_dir=Path(task.task_info.get("renders_dir")),
+                    engine_conf=task.task_info
                 )
                 render_time = time.time() - start_time
 
@@ -174,13 +175,13 @@ def render_task(self, task_id: int):
 
         loop.run_until_complete(task.save())
 
-        logger.info(f"任务 {task_id} 完成，工作空间保留在: {task.workspace_dir}")
+        logger.info(f"任务 {task_id} 完成，工作空间保留在: {task.task_info.get('workspace_dir')}")
 
     except Ignore:
         # 任务被取消
         task.status = TaskStatus.CANCELLED
         loop.run_until_complete(task.save())
-        logger.info(f"任务 {task_id} 已取消，工作空间保留在: {task.workspace_dir}")
+        logger.info(f"任务 {task_id} 已取消，工作空间保留在: {task.task_info.get('workspace_dir')}")
         raise
 
     except Exception as e:
@@ -188,7 +189,7 @@ def render_task(self, task_id: int):
         task.status = TaskStatus.FAILED
         task.error_message = str(e)
         loop.run_until_complete(task.save())
-        logger.error(f"任务 {task_id} 失败，工作空间保留在: {task.workspace_dir}")
+        logger.error(f"任务 {task_id} 失败，工作空间保留在: {task.task_info.get('workspace_dir')}")
 
         # 重新抛出原始异常，让Celery记录错误
         raise
@@ -240,10 +241,10 @@ def retry_render_frame(self, task_id: int, frame_number: int):
         # 执行渲染
         start_time = time.time()
         output_path, stdout, stderr = renderer.render_frame(
-            project_file=task.project_file,
+            project_file=task.task_info.get("project_file"),
             frame_number=frame.frame_number,
-            output_dir=Path(task.renders_dir),
-            engine_conf=task.render_engine_conf
+            output_dir=Path(task.task_info.get("renders_dir")),
+            engine_conf=task.task_info
         )
         render_time = time.time() - start_time
 

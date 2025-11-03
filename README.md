@@ -73,9 +73,10 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 
 # 文件存储配置
-RENDER_OUTPUT_DIR=C:/render_outputs
-THUMBNAIL_DIR=C:/render_outputs/thumbnails
-UPLOAD_DIR=C:/uploads
+# 工作空间根目录（每个任务都会创建独立的子目录：{unionid}/{task_id}/）
+# 默认包含：source/、project/、Sys_Default_Renders/ 三个子目录
+# 可通过 task_info 自定义目录名称
+WORKSPACE_ROOT_DIR=C:/workspace
 
 # 渲染引擎配置（根据实际安装路径修改）
 MAYA_EXECUTABLE=C:/Program Files/Autodesk/Maya2024/bin/mayabatch.exe
@@ -105,11 +106,17 @@ celery -A app.celery_app.celery worker --pool=solo --loglevel=info -Q high_prior
 curl -X POST "http://localhost:8000/api/tasks/" \
   -H "Content-Type: application/json" \
   -d '{
-    "project_file": "C:/uploads/my_project.ma",
+    "unionid": "user123",
+    "oss_file_path": "projects/user123/my_project.ma.gz",
+    "is_compressed": true,
     "render_engine": "maya",
-    "priority": 7,
-    "total_frames": 100,
-    "max_retries": 3
+    "task_info": {
+      "renderer": "arnold",
+      "source_dir": "source",
+      "project_dir": "project",
+      "renders_dir": "Sys_Default_Renders"
+    },
+    "total_frames": 100
   }'
 ```
 

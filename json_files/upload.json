@@ -1,0 +1,144 @@
+{
+    "asset": [
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/config.ocio",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/config.ocio"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/ACES_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_CIE-XYZ_1.0.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/ACES_to_CIE-XYZ_1.0.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_CIE-XYZ_v0.7.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/ACES_to_CIE-XYZ_v0.7.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_sRGB_1.0.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/ACES_to_sRGB_1.0.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACES_to_sRGB_v0.7.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/ACES_to_sRGB_v0.7.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACEScc_to_ACES2065-1.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/ACEScc_to_ACES2065-1.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ACEScg_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/ACEScg_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\ADX10_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/ADX10_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Alexa-v3-LogC-EI800_no-cam-black_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/Alexa-v3-LogC-EI800_no-cam-black_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Bitsquid_tonemap.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/Bitsquid_tonemap.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\CIE-XYZ_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/CIE-XYZ_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\F65-SLog2_to_ACES_no-cam-black.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/F65-SLog2_to_ACES_no-cam-black.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Lin_to_Log--classic.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/Lin_to_Log--classic.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\LinearP3-DCI_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/LinearP3-DCI_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\LinearRec709-sRGB_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/LinearRec709-sRGB_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\LinearUHDTV_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/LinearUHDTV_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Log_to_Lin--classic.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/Log_to_Lin--classic.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Log_to_Lin--jzp.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/Log_to_Lin--jzp.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\SharpRGB_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/SharpRGB_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\Unity_neutral_tonemap.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/Unity_neutral_tonemap.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\gamma_1.8_Rec709_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/gamma_1.8_Rec709_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\gamma_2.2_Rec709_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/gamma_2.2_Rec709_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\gamma_2.4_Rec709_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/gamma_2.4_Rec709_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\raw.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/raw.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_Rec709-camera_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/untonemapped_Rec709-camera_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_gamma--1.8.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/untonemapped_gamma--1.8.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_gamma--2.2.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/untonemapped_gamma--2.2.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_gamma--Rec709.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/untonemapped_gamma--Rec709.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_gamma--sRGB.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/untonemapped_gamma--sRGB.ctf"
+        },
+        {
+            "local": "C:/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy\\ctfs\\untonemapped_sRGB_to_ACES.ctf",
+            "server": "/C/Program Files/Autodesk/Maya2022/resources/OCIO-configs/Maya-legacy/ctfs/untonemapped_sRGB_to_ACES.ctf"
+        },
+        {
+            "local": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33__wolf_fur_v02.xgen",
+            "server": "/C/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33__wolf_fur_v02.xgen"
+        },
+        {
+            "local": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33.ma",
+            "server": "/C/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33.ma"
+        }
+    ],
+    "scene": [
+        {
+            "hash": "6e57efc1fb88700dfc4820e160348f07",
+            "local": "C:/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33.ma",
+            "server": "/C/Project/RenderTest/Arnold/MayaProject/wolf_xgen/Wolf/scenes/wolf_fur_refV33.ma",
+            "xxhash": "7021565326244519815"
+        }
+    ]
+}

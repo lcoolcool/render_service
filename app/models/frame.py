@@ -31,6 +31,10 @@ class RenderFrame(Model):
     # 渲染日志
     stdout = fields.TextField(null=True)
     stderr = fields.TextField(null=True)
+    # 是否已删除（软删除）
+    is_deleted = fields.BooleanField(default=False)
+    # 分区日期（用于数据分区管理，自动获取创建日期）
+    p_date = fields.DateField(auto_now_add=True, index=True)
     # 时间戳
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)

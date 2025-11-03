@@ -1,6 +1,7 @@
 """任务管理API路由"""
 from fastapi import APIRouter, HTTPException, Query
 from celery.result import AsyncResult
+from datetime import date
 from app.schemas.task import TaskCreate, TaskResponse, TaskStatusResponse, TaskListResponse
 from app.schemas.frame import FrameResponse, FrameListResponse
 from app.models.task import RenderTask, TaskStatus
@@ -21,7 +22,7 @@ async def create_task(task_data: TaskCreate):
     - **file_path**: 本地工程文件路径（与oss_file_path二选一）
     - **is_compressed**: 文件是否为压缩格式
     - **render_engine**: 渲染引擎（maya/ue）
-    - **render_engine_conf**: 渲染引擎配置
+    - **task_info**: 任务信息，包含执行任务所需的所有配置
     - **total_frames**: 总帧数
     """
     try:
@@ -32,17 +33,19 @@ async def create_task(task_data: TaskCreate):
             file_path=task_data.file_path,
             is_compressed=task_data.is_compressed,
             render_engine=task_data.render_engine,
-            render_engine_conf=task_data.render_engine_conf,
+            task_info=task_data.task_info,
             total_frames=task_data.total_frames,
             status=TaskStatus.PENDING
         )
 
         # 创建帧记录
+        today = date.today()
         frames_data = [
             {
                 "task_id": task.id,
                 "frame_number": i,
-                "status": FrameStatus.PENDING
+                "status": FrameStatus.PENDING,
+                "p_date": today  # 手动设置分区日期（bulk_create不会自动填充auto_now_add字段）
             }
             for i in range(1, task_data.total_frames + 1)
         ]
@@ -65,10 +68,8 @@ async def create_task(task_data: TaskCreate):
             oss_file_path=task.oss_file_path,
             file_path=task.file_path,
             is_compressed=task.is_compressed,
-            project_file=task.project_file,
-            workspace_dir=task.workspace_dir,
             render_engine=task.render_engine.value,
-            render_engine_conf=task.render_engine_conf,
+            task_info=task.task_info,
             status=task.status.value,
             total_frames=task.total_frames,
             completed_frames=task.completed_frames,
@@ -99,10 +100,8 @@ async def get_task(task_id: int):
         oss_file_path=task.oss_file_path,
         file_path=task.file_path,
         is_compressed=task.is_compressed,
-        project_file=task.project_file,
-        workspace_dir=task.workspace_dir,
         render_engine=task.render_engine.value,
-        render_engine_conf=task.render_engine_conf,
+        task_info=task.task_info,
         status=task.status.value,
         total_frames=task.total_frames,
         completed_frames=task.completed_frames,
@@ -165,10 +164,8 @@ async def list_tasks(
             oss_file_path=task.oss_file_path,
             file_path=task.file_path,
             is_compressed=task.is_compressed,
-            project_file=task.project_file,
-            workspace_dir=task.workspace_dir,
             render_engine=task.render_engine.value,
-            render_engine_conf=task.render_engine_conf,
+            task_info=task.task_info,
             status=task.status.value,
             total_frames=task.total_frames,
             completed_frames=task.completed_frames,
@@ -310,10 +307,11 @@ async def cleanup_task_workspace(task_id: int):
         )
 
     # 检查工作空间是否存在
-    if not task.workspace_dir:
+    workspace_dir = task.task_info.get("workspace_dir")
+    if not workspace_dir:
         return {"message": "任务没有工作空间", "task_id": task_id}
 
-    workspace_path = Path(task.workspace_dir)
+    workspace_path = Path(workspace_dir)
     if not workspace_path.exists():
         return {"message": "工作空间目录不存在", "task_id": task_id, "workspace": str(workspace_path)}
 
@@ -393,10 +391,11 @@ async def cleanup_tasks_workspace(
     failed_tasks = []
 
     for task in tasks:
-        if not task.workspace_dir:
+        workspace_dir = task.task_info.get("workspace_dir")
+        if not workspace_dir:
             continue
 
-        workspace_path = Path(task.workspace_dir)
+        workspace_path = Path(workspace_dir)
         if not workspace_path.exists():
             continue
 
@@ -441,7 +440,9 @@ async def retry_frame(task_id: int, frame_number: int):
         raise HTTPException(status_code=400, detail="任务已取消，无法重试")
 
     # 检查工作空间是否存在
-    if not task.workspace_dir or not task.project_file:
+    workspace_dir = task.task_info.get("workspace_dir")
+    project_file = task.task_info.get("project_file")
+    if not workspace_dir or not project_file:
         raise HTTPException(
             status_code=400,
             detail="任务工作空间不存在，无法重试。请重新创建任务。"

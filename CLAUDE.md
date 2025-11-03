@@ -114,14 +114,24 @@ redis-cli ping
 - **文件准备服务** (`services/file_preparation.py`)：整合下载、解压、查找工程文件的完整流程
 
 ### 8. 文件隔离机制
-- **目录结构**：
+- **目录结构**（可通过 task_info 自定义）：
   ```
   C:/workspace/
-    └── {unionid}/              # 用户级隔离
-        └── {task_id}/          # 任务级隔离
-            ├── source/         # OSS下载的原始文件
-            ├── project/        # 解压后的工程文件
-            └── renders/        # 渲染输出文件
+    └── {unionid}/                    # 用户级隔离
+        └── {task_id}/                # 任务级隔离
+            ├── source/               # OSS下载的原始文件（默认：source，可通过 task_info.source_dir 自定义）
+            ├── project/              # 解压后的工程文件（默认：project，可通过 task_info.project_dir 自定义）
+            └── Sys_Default_Renders/  # 渲染输出文件（默认：Sys_Default_Renders，可通过 task_info.renders_dir 自定义）
+  ```
+- **路径自定义**：通过 task_info 可以为每个任务指定不同的目录名称：
+  ```json
+  {
+    "task_info": {
+      "source_dir": "custom_source",
+      "project_dir": "custom_project",
+      "renders_dir": "custom_renders"
+    }
+  }
   ```
 - **手动清理**：任务完成、失败或取消后工作空间保留，用户可通过 API 手动清理
 - **单帧重试**：失败的帧可以重新渲染，复用已下载的工程文件，无需重新从 OSS 下载
@@ -145,9 +155,9 @@ OSS_ACCESS_KEY_SECRET=your_access_key_secret
 OSS_BUCKET_NAME=your_bucket_name
 
 # 文件存储
-UPLOAD_DIR=C:/uploads
 # 工作空间根目录（每个任务都会创建独立的子目录：{unionid}/{task_id}/）
-# 包含：source/、project/、renders/ 三个子目录
+# 默认包含：source/、project/、Sys_Default_Renders/ 三个子目录
+# 可通过 task_info 自定义目录名称
 WORKSPACE_ROOT_DIR=C:/workspace
 
 # 渲染引擎路径（必须根据实际安装路径修改）
@@ -230,8 +240,12 @@ curl -X POST "http://localhost:8000/api/tasks/" \
     "oss_file_path": "projects/user123/test_scene.ma.gz",
     "is_compressed": true,
     "render_engine": "maya",
-    "render_engine_conf": {"renderer": "arnold"},
-    "priority": 5,
+    "task_info": {
+      "renderer": "arnold",
+      "source_dir": "source",
+      "project_dir": "project",
+      "renders_dir": "Sys_Default_Renders"
+    },
     "total_frames": 10
   }'
 

@@ -1,0 +1,140 @@
+{
+  "example_1_maya_oss_compressed": {
+    "description": "使用 OSS 压缩文件创建 Maya Arnold 渲染任务",
+    "request_body": {
+      "unionid": "user_wx123456",
+      "oss_file_path": "projects/user_wx123456/wolf_fur_refV33.ma.gz",
+      "is_compressed": true,
+      "render_engine": "maya",
+      "task_info": {
+        "renderer": "arnold",
+        "source_dir": "source",
+        "project_dir": "project",
+        "renders_dir": "Sys_Default_Renders",
+        "quality": "high",
+        "camera": "cameraShape1",
+        "image_format": "exr",
+        "resolution": {
+          "width": 2048,
+          "height": 1152
+        },
+        "sampling": {
+          "camera": 7,
+          "diffuse": 5,
+          "specular": 5
+        }
+      },
+      "total_frames": 100
+    }
+  },
+  "example_2_maya_local_file": {
+    "description": "使用本地文件创建 Maya 渲染任务",
+    "request_body": {
+      "unionid": "user_wx789012",
+      "file_path": "C:/MyProjects/scene_test.ma",
+      "is_compressed": false,
+      "render_engine": "maya",
+      "task_info": {
+        "renderer": "arnold",
+        "source_dir": "source",
+        "project_dir": "project",
+        "renders_dir": "renders_output",
+        "camera": "perspShape",
+        "quality": "medium"
+      },
+      "total_frames": 50
+    }
+  },
+  "example_3_maya_oss_zip": {
+    "description": "使用 OSS ZIP 压缩文件创建 Maya 渲染任务",
+    "request_body": {
+      "unionid": "user_wx345678",
+      "oss_file_path": "projects/user_wx345678/my_scene.zip",
+      "is_compressed": true,
+      "render_engine": "maya",
+      "task_info": {
+        "renderer": "arnold",
+        "source_dir": "downloaded",
+        "project_dir": "extracted",
+        "renders_dir": "output_frames",
+        "image_format": "png",
+        "resolution": {
+          "width": 1920,
+          "height": 1080
+        }
+      },
+      "total_frames": 240
+    }
+  },
+  "example_4_ue_project": {
+    "description": "使用 Unreal Engine 创建渲染任务",
+    "request_body": {
+      "unionid": "user_wx901234",
+      "oss_file_path": "projects/user_wx901234/MyUEProject.zip",
+      "is_compressed": true,
+      "render_engine": "ue",
+      "task_info": {
+        "source_dir": "source",
+        "project_dir": "project",
+        "renders_dir": "Sys_Default_Renders",
+        "resolution_x": 1920,
+        "resolution_y": 1080,
+        "quality": 100,
+        "sequence_path": "/Game/Sequences/MasterSequence"
+      },
+      "total_frames": 120
+    }
+  },
+  "example_5_minimal": {
+    "description": "最小配置（使用默认值）",
+    "request_body": {
+      "unionid": "user_wx567890",
+      "oss_file_path": "projects/user_wx567890/simple_scene.ma.gz",
+      "is_compressed": true,
+      "render_engine": "maya",
+      "task_info": {
+        "renderer": "arnold"
+      },
+      "total_frames": 24
+    },
+    "note": "如果不指定 source_dir、project_dir、renders_dir，系统会使用默认值：source、project、Sys_Default_Renders"
+  },
+  "curl_example": {
+    "description": "使用 curl 命令创建任务的示例",
+    "command": "curl -X POST \"http://localhost:8000/api/tasks/\" -H \"Content-Type: application/json\" -d @create_task_request.json"
+  },
+  "notes": {
+    "unionid": "用户唯一标识，用于文件隔离",
+    "oss_file_path_or_file_path": "必须提供其中之一，不能同时提供",
+    "is_compressed": "如果文件是 .gz 或 .zip 格式，设置为 true",
+    "render_engine": "maya 或 ue",
+    "task_info": {
+      "description": "任务配置信息，根据渲染引擎不同而不同",
+      "maya_fields": {
+        "renderer": "渲染器类型（arnold、vray 等）",
+        "camera": "相机名称（可选）",
+        "image_format": "输出图片格式（可选）",
+        "resolution": "分辨率配置（可选）",
+        "sampling": "采样配置（可选）",
+        "source_dir": "源文件目录名（默认：source）",
+        "project_dir": "工程文件目录名（默认：project）",
+        "renders_dir": "渲染输出目录名（默认：Sys_Default_Renders）"
+      },
+      "ue_fields": {
+        "resolution_x": "水平分辨率（默认：1920）",
+        "resolution_y": "垂直分辨率（默认：1080）",
+        "quality": "渲染质量（默认：100）",
+        "sequence_path": "序列路径（可选）",
+        "source_dir": "源文件目录名（默认：source）",
+        "project_dir": "工程文件目录名（默认：project）",
+        "renders_dir": "渲染输出目录名（默认：Sys_Default_Renders）"
+      }
+    },
+    "total_frames": "总帧数，必须大于 0",
+    "workspace_structure": {
+      "description": "任务执行后会创建以下目录结构",
+      "structure": "C:/workspace/{unionid}/{task_id}/{source_dir|project_dir|renders_dir}/",
+      "example": "C:/workspace/user_wx123456/1/source/\n                                  /project/\n                                  /Sys_Default_Renders/"
+    }
+  }
+}

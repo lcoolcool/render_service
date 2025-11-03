@@ -25,7 +25,8 @@ class FilePreparationService:
         oss_file_path: Optional[str],
         file_path: Optional[str],
         is_compressed: bool,
-        render_engine: RenderEngine
+        render_engine: RenderEngine,
+        task_info: Optional[dict] = None
     ) -> Tuple[Path, Path, Path]:
         """
         准备渲染工程文件（完整流程）
@@ -34,10 +35,10 @@ class FilePreparationService:
         - 如果提供了file_path（本地文件），直接使用本地文件
         - 如果提供了oss_file_path（OSS文件），则：
           1. 创建任务隔离的工作空间目录
-          2. 从OSS下载文件到 source/ 目录
-          3. 如果是压缩文件，解压到 project/ 目录
+          2. 从OSS下载文件到 source/ 目录（可从task_info自定义）
+          3. 如果是压缩文件，解压到 project/ 目录（可从task_info自定义）
           4. 查找工程文件路径
-          5. 返回工程文件路径、工作空间路径和渲染输出目录
+          5. 返回工程文件路径、工作空间路径和渲染输出目录（可从task_info自定义）
 
         Args:
             unionid: 用户ID（用于目录隔离）
@@ -46,6 +47,10 @@ class FilePreparationService:
             file_path: 本地文件路径（可选）
             is_compressed: 是否为压缩文件
             render_engine: 渲染引擎类型（用于确定工程文件扩展名）
+            task_info: 任务配置信息，可包含：
+                - source_dir: 源文件目录名（默认: "source"）
+                - project_dir: 工程文件目录名（默认: "project"）
+                - renders_dir: 渲染输出目录名（默认: "Sys_Default_Renders"）
 
         Returns:
             (工程文件路径, 工作空间目录路径, 渲染输出目录)
@@ -54,12 +59,14 @@ class FilePreparationService:
             FileNotFoundError: 文件下载或查找失败
             ValueError: 解压失败或不支持的格式
         """
+        task_info = task_info or {}
+
         # 使用本地文件
         if file_path:
-            return self._prepare_local_file(unionid, task_id, file_path, is_compressed, render_engine)
+            return self._prepare_local_file(unionid, task_id, file_path, is_compressed, render_engine, task_info)
         # 使用OSS文件
         elif oss_file_path:
-            return self._prepare_oss_file(unionid, task_id, oss_file_path, is_compressed, render_engine)
+            return self._prepare_oss_file(unionid, task_id, oss_file_path, is_compressed, render_engine, task_info)
         else:
             raise ValueError("必须提供 oss_file_path 或 file_path 其中之一")
 
@@ -69,7 +76,8 @@ class FilePreparationService:
         task_id: int,
         file_path: str,
         is_compressed: bool,
-        render_engine: RenderEngine
+        render_engine: RenderEngine,
+        task_info: dict
     ) -> Tuple[Path, Path, Path]:
         """
         准备本地文件（无需从OSS下载）
@@ -87,6 +95,7 @@ class FilePreparationService:
             file_path: 本地文件路径
             is_compressed: 是否为压缩文件
             render_engine: 渲染引擎类型
+            task_info: 任务配置信息
 
         Returns:
             (工程文件路径, 工作空间目录路径, 渲染输出目录)
@@ -101,11 +110,15 @@ class FilePreparationService:
             if not local_file.exists():
                 raise FileNotFoundError(f"本地文件不存在: {file_path}")
 
-            # 1. 创建工作空间目录结构
+            # 1. 创建工作空间目录结构（从task_info读取路径配置，如果没有则使用默认值）
             workspace_dir = self._create_workspace(unionid, task_id)
-            source_dir = workspace_dir / "source"
-            project_dir = workspace_dir / "project"
-            renders_dir = workspace_dir / "renders"
+            source_dir_name = task_info.get("source_dir", "source")
+            project_dir_name = task_info.get("project_dir", "project")
+            renders_dir_name = task_info.get("renders_dir", "Sys_Default_Renders")
+
+            source_dir = workspace_dir / source_dir_name
+            project_dir = workspace_dir / project_dir_name
+            renders_dir = workspace_dir / renders_dir_name
 
             source_dir.mkdir(parents=True, exist_ok=True)
             project_dir.mkdir(parents=True, exist_ok=True)
@@ -155,7 +168,8 @@ class FilePreparationService:
         task_id: int,
         oss_file_path: str,
         is_compressed: bool,
-        render_engine: RenderEngine
+        render_engine: RenderEngine,
+        task_info: dict
     ) -> Tuple[Path, Path, Path]:
         """
         准备OSS文件（原有逻辑）
@@ -173,6 +187,7 @@ class FilePreparationService:
             oss_file_path: OSS文件路径
             is_compressed: 是否为压缩文件
             render_engine: 渲染引擎类型
+            task_info: 任务配置信息
 
         Returns:
             (工程文件路径, 工作空间目录路径, 渲染输出目录)
@@ -182,11 +197,15 @@ class FilePreparationService:
             ValueError: 解压失败或不支持的格式
         """
         try:
-            # 1. 创建工作空间目录结构
+            # 1. 创建工作空间目录结构（从task_info读取路径配置，如果没有则使用默认值）
             workspace_dir = self._create_workspace(unionid, task_id)
-            source_dir = workspace_dir / "source"
-            project_dir = workspace_dir / "project"
-            renders_dir = workspace_dir / "renders"
+            source_dir_name = task_info.get("source_dir", "source")
+            project_dir_name = task_info.get("project_dir", "project")
+            renders_dir_name = task_info.get("renders_dir", "Sys_Default_Renders")
+
+            source_dir = workspace_dir / source_dir_name
+            project_dir = workspace_dir / project_dir_name
+            renders_dir = workspace_dir / renders_dir_name
 
             source_dir.mkdir(parents=True, exist_ok=True)
             project_dir.mkdir(parents=True, exist_ok=True)

@@ -12,7 +12,7 @@ class TaskCreate(BaseModel):
     file_path: Optional[str] = Field(default=None, description="本地工程文件路径")
     is_compressed: bool = Field(default=False, description="文件是否为压缩格式 (支持.gz, .zip)")
     render_engine: RenderEngine = Field(..., description="渲染引擎类型 (maya/ue)")
-    render_engine_conf: dict = Field(default_factory=dict, description="渲染引擎配置 (例如: Maya的renderer类型、UE的分辨率等)")
+    task_info: dict = Field(default_factory=dict, description="任务信息，包含执行任务所需的所有配置 (例如: Maya的renderer类型、UE的分辨率等)")
     total_frames: int = Field(..., gt=0, description="总帧数")
 
     def model_post_init(self, __context):
@@ -29,7 +29,7 @@ class TaskCreate(BaseModel):
                 "oss_file_path": "projects/user123/my_project.ma.gz",
                 "is_compressed": True,
                 "render_engine": "maya",
-                "render_engine_conf": {
+                "task_info": {
                     "renderer": "arnold",
                     "quality": "high"
                 },
@@ -45,10 +45,8 @@ class TaskResponse(BaseModel):
     oss_file_path: Optional[str]  # OSS文件路径
     file_path: Optional[str]  # 本地文件路径
     is_compressed: bool
-    project_file: Optional[str]  # 本地工程文件路径（下载解压后）
-    workspace_dir: Optional[str]  # 任务工作空间目录
     render_engine: str
-    render_engine_conf: dict
+    task_info: dict  # 包含 project_file、workspace_dir、renders_dir 等路径信息
     status: str
     total_frames: int
     completed_frames: int
