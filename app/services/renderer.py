@@ -118,60 +118,137 @@ class MayaRenderer(BaseRenderer):
         return output_file, stdout, stderr
 
     def _find_output_file(self, output_dir: Path, frame_number: int, stdout: str) -> Optional[Path]:
-        """从Maya输出中查找渲染结果文件"""
+        """
+        从Maya输出中查找渲染结果文件
 
-        # 尝试从stdout中解析文件路径
-        # Maya通常会输出类似 "Rendering: C:/path/to/image.0001.exr" 的信息
-        pattern = r'(?:Rendering|Result):\s*([^\n]+\.(?:exr|png|jpg|jpeg|tif|tiff))'
-        matches = re.findall(pattern, stdout, re.IGNORECASE)
+        查找策略（按优先级）：
+        1. 从stdout日志解析文件路径
+        2. 在输出目录中查找匹配帧号的图片文件
+        3. 返回最新修改的图片文件（兜底方案）
+        """
 
-        if matches:
-            return Path(matches[-1].strip())
+        # 策略1: 从stdout解析文件路径
+        # Maya常见输出格式：
+        # - "Rendering: C:/path/to/image.0001.exr"
+        # - "Result: /path/to/scene.exr.0001"
+        # - "Writing file: scene_0001.png"
+        output_file = self._parse_output_from_stdout(stdout)
+        if output_file and output_file.exists():
+            return output_file
 
-        # 如果无法从输出解析，尝试在输出目录中查找
-        # Maya的文件扩展名位置可能不固定，需要支持多种格式：
-        # - scene.0001.exr （扩展名在最后）
-        # - scene.exr.0001 （扩展名在中间）
-        # - scene_0001.exr （下划线分隔）
+        # 策略2: 在输出目录中查找匹配的文件
+        output_file = self._search_output_in_directory(output_dir, frame_number)
+        if output_file:
+            return output_file
 
-        frame_str_4 = f"{frame_number:04d}"  # 4位补齐
-        frame_str_no_pad = str(frame_number)  # 不补齐
-
-        supported_exts = ['.exr', '.png', '.jpg', '.jpeg', '.tif', '.tiff']
-
-        # 策略1：查找所有可能包含帧号的文件
-        search_patterns = [
-            f"*{frame_str_4}*",  # 包含4位帧号
-            f"*{frame_str_no_pad}.*",  # 包含不补齐的帧号
-            f"*_{frame_str_4}*",  # 下划线分隔
-            f"*.{frame_str_4}.*",  # 点分隔
-        ]
-
-        candidates = []
-        for pattern in search_patterns:
-            candidates.extend(output_dir.glob(pattern))
-
-        # 策略2：从候选文件中筛选出有效的图片文件
-        for candidate in candidates:
-            # 检查文件是否包含支持的扩展名（可能在任意位置）
-            file_name_lower = candidate.name.lower()
-            if any(ext in file_name_lower for ext in supported_exts):
-                # 验证文件确实包含正确的帧号
-                if frame_str_4 in candidate.name or frame_str_no_pad in candidate.name:
-                    return candidate
-
-        # 策略3：如果还是找不到，尝试最新修改的图片文件（作为兜底方案）
-        all_image_files = []
-        for ext in supported_exts:
-            all_image_files.extend(output_dir.glob(f"*{ext}"))
-            all_image_files.extend(output_dir.glob(f"*{ext}.*"))
-
-        if all_image_files:
-            # 按修改时间排序，返回最新的
-            all_image_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
-            return all_image_files[0]
+        # 策略3: 兜底方案 - 返回最新修改的图片文件
+        output_file = self._find_latest_image(output_dir)
+        if output_file:
+            return output_file
 
         return None
+
+    def _parse_output_from_stdout(self, stdout: str) -> Optional[Path]:
+        """从Maya的stdout日志中解析输出文件路径"""
+
+        # 匹配常见的输出模式，支持多种图片格式
+        patterns = [
+            r'(?:Rendering|Result|Writing\s+file):\s*([^\n\r]+\.(?:exr|png|jpg|jpeg|tif|tiff|tga|bmp|iff))',
+            r'Writing\s+([^\n\r]+\.(?:exr|png|jpg|jpeg|tif|tiff|tga|bmp|iff))',
+            r'File\s+written:\s*([^\n\r]+\.(?:exr|png|jpg|jpeg|tif|tiff|tga|bmp|iff))',
+        ]
+
+        for pattern in patterns:
+            matches = re.findall(pattern, stdout, re.IGNORECASE)
+            if matches:
+                # 返回最后一个匹配（通常是最终的输出文件）
+                file_path = Path(matches[-1].strip())
+                # 清理可能的引号和空白字符
+                file_path_str = str(file_path).strip('"\'')
+                return Path(file_path_str)
+
+        return None
+
+    def _search_output_in_directory(self, output_dir: Path, frame_number: int) -> Optional[Path]:
+        """
+        在输出目录中查找匹配帧号的渲染文件
+
+        支持的文件名格式：
+        - scene.0001.exr （扩展名在最后）
+        - scene.exr.0001 （扩展名在中间）
+        - scene_0001.exr （下划线分隔）
+        - scene-0001.exr （连字符分隔）
+        """
+
+        supported_exts = ('.exr', '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.tga', '.bmp', '.iff')
+
+        # 准备帧号的多种格式
+        frame_patterns = [
+            f"{frame_number:04d}",  # 0001
+            f"{frame_number:05d}",  # 00001
+            f"{frame_number:06d}",  # 000001
+            str(frame_number),      # 1
+        ]
+
+        # 编译正则表达式：匹配包含帧号的文件名
+        # 使用单词边界确保精确匹配（避免 frame 1 匹配到 frame 10）
+        regex_patterns = []
+        for frame_str in frame_patterns:
+            # 匹配各种分隔符：点、下划线、连字符、或直接连接
+            regex_patterns.append(
+                re.compile(
+                    rf'(?:^|[._-])({re.escape(frame_str)})(?:[._-]|$)',
+                    re.IGNORECASE
+                )
+            )
+
+        # 遍历输出目录中的所有文件（只遍历一次）
+        best_match = None
+        best_priority = -1
+
+        for file_path in output_dir.iterdir():
+            if not file_path.is_file():
+                continue
+
+            file_name = file_path.name
+            file_name_lower = file_name.lower()
+
+            # 检查是否为支持的图片格式
+            if not any(file_name_lower.endswith(ext) or ext in file_name_lower for ext in supported_exts):
+                continue
+
+            # 检查文件名是否匹配帧号
+            for priority, (frame_str, regex_pattern) in enumerate(zip(frame_patterns, regex_patterns)):
+                if regex_pattern.search(file_name):
+                    # 优先级：4位补齐 > 5位补齐 > 6位补齐 > 无补齐
+                    if priority > best_priority:
+                        best_priority = priority
+                        best_match = file_path
+                    break  # 找到匹配后跳出内层循环
+
+        return best_match
+
+    def _find_latest_image(self, output_dir: Path) -> Optional[Path]:
+        """查找输出目录中最新修改的图片文件（兜底方案）"""
+
+        supported_exts = ('.exr', '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.tga', '.bmp', '.iff')
+
+        image_files = []
+        for file_path in output_dir.iterdir():
+            if not file_path.is_file():
+                continue
+
+            # 检查扩展名（支持扩展名在中间或最后）
+            file_name_lower = file_path.name.lower()
+            if any(file_name_lower.endswith(ext) or ext in file_name_lower for ext in supported_exts):
+                image_files.append(file_path)
+
+        if not image_files:
+            return None
+
+        # 按修改时间排序，返回最新的
+        image_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+        return image_files[0]
 
 
 class UERenderer(BaseRenderer):

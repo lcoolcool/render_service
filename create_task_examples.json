@@ -24,7 +24,7 @@
           "specular": 5
         }
       },
-      "total_frames": 100
+      "total_frames": 10
     }
   },
   "example_2_maya_local_file": {
@@ -42,7 +42,7 @@
         "camera": "perspShape",
         "quality": "medium"
       },
-      "total_frames": 50
+      "total_frames": 5
     }
   },
   "example_3_maya_oss_zip": {
@@ -63,7 +63,7 @@
           "height": 1080
         }
       },
-      "total_frames": 240
+      "total_frames": 2
     }
   },
   "example_4_ue_project": {
@@ -82,7 +82,7 @@
         "quality": 100,
         "sequence_path": "/Game/Sequences/MasterSequence"
       },
-      "total_frames": 120
+      "total_frames": 12
     }
   },
   "example_5_minimal": {
