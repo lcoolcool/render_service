@@ -114,24 +114,14 @@ redis-cli ping
 - **文件准备服务** (`services/file_preparation.py`)：整合下载、解压、查找工程文件的完整流程
 
 ### 8. 文件隔离机制
-- **目录结构**（可通过 task_info 自定义）：
+- **目录结构**（所有目录名称由系统统一配置）：
   ```
   C:/workspace/
     └── {unionid}/                    # 用户级隔离
         └── {task_id}/                # 任务级隔离
-            ├── source/               # OSS下载的原始文件（默认：source，可通过 task_info.source_dir 自定义）
-            ├── project/              # 解压后的工程文件（默认：project，可通过 task_info.project_dir 自定义）
-            └── Sys_Default_Renders/  # 渲染输出文件（默认：Sys_Default_Renders，可通过 task_info.renders_dir 自定义）
-  ```
-- **路径自定义**：通过 task_info 可以为每个任务指定不同的目录名称：
-  ```json
-  {
-    "task_info": {
-      "source_dir": "custom_source",
-      "project_dir": "custom_project",
-      "renders_dir": "custom_renders"
-    }
-  }
+            ├── source/               # OSS下载的原始文件（通过 SOURCE_DIR_NAME 设置）
+            ├── project/              # 解压后的工程文件（通过 PROJECT_DIR_NAME 设置）
+            └── Sys_Default_Renders/  # 渲染输出文件（通过 RENDERS_DIR_NAME 设置）
   ```
 - **手动清理**：任务完成、失败或取消后工作空间保留，用户可通过 API 手动清理
 - **单帧重试**：失败的帧可以重新渲染，复用已下载的工程文件，无需重新从 OSS 下载
@@ -157,8 +147,12 @@ OSS_BUCKET_NAME=your_bucket_name
 # 文件存储
 # 工作空间根目录（每个任务都会创建独立的子目录：{unionid}/{task_id}/）
 # 默认包含：source/、project/、Sys_Default_Renders/ 三个子目录
-# 可通过 task_info 自定义目录名称
 WORKSPACE_ROOT_DIR=C:/workspace
+
+# 工作空间子目录名称（系统统一配置）
+SOURCE_DIR_NAME=source
+PROJECT_DIR_NAME=project
+RENDERS_DIR_NAME=Sys_Default_Renders
 
 # 渲染引擎路径（必须根据实际安装路径修改）
 MAYA_EXECUTABLE=C:/Program Files/Autodesk/Maya2024/bin/Render.exe
@@ -241,10 +235,7 @@ curl -X POST "http://localhost:8000/api/tasks/" \
     "is_compressed": true,
     "render_engine": "maya",
     "task_info": {
-      "renderer": "arnold",
-      "source_dir": "source",
-      "project_dir": "project",
-      "renders_dir": "Sys_Default_Renders"
+      "renderer": "arnold"
     },
     "total_frames": 10
   }'

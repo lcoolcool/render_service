@@ -121,10 +121,7 @@ POST /api/tasks/
   "is_compressed": true,
   "render_engine": "maya",
   "task_info": {
-    "renderer": "arnold",
-    "source_dir": "source",
-    "project_dir": "project",
-    "renders_dir": "Sys_Default_Renders"
+    "renderer": "arnold"
   },
   "total_frames": 100,
   "priority": 5

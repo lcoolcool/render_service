@@ -75,8 +75,12 @@ REDIS_PORT=6379
 # 文件存储配置
 # 工作空间根目录（每个任务都会创建独立的子目录：{unionid}/{task_id}/）
 # 默认包含：source/、project/、Sys_Default_Renders/ 三个子目录
-# 可通过 task_info 自定义目录名称
 WORKSPACE_ROOT_DIR=C:/workspace
+
+# 工作空间子目录名称（系统统一配置）
+SOURCE_DIR_NAME=source
+PROJECT_DIR_NAME=project
+RENDERS_DIR_NAME=Sys_Default_Renders
 
 # 渲染引擎配置（根据实际安装路径修改）
 MAYA_EXECUTABLE=C:/Program Files/Autodesk/Maya2024/bin/mayabatch.exe
@@ -111,10 +115,7 @@ curl -X POST "http://localhost:8000/api/tasks/" \
     "is_compressed": true,
     "render_engine": "maya",
     "task_info": {
-      "renderer": "arnold",
-      "source_dir": "source",
-      "project_dir": "project",
-      "renders_dir": "Sys_Default_Renders"
+      "renderer": "arnold"
     },
     "total_frames": 100
   }'

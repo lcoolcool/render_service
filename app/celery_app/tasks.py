@@ -8,6 +8,7 @@ from celery import Task
 from celery.exceptions import Ignore
 from app.celery_app.celery import celery_app
 from app.config import settings
+from app.services.oss_storage import OSSStorageService
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,49 @@ class DatabaseTask(Task):
                         )
                     )
                     self._db_initialized = True
+
+
+def upload_frame_to_oss(unionid: str, task_id: int, frame_number: int, local_output_path: Path) -> str:
+    """
+    上传渲染结果到OSS
+
+    Args:
+        unionid: 用户ID
+        task_id: 任务ID
+        frame_number: 帧序号
+        local_output_path: 本地输出文件路径
+
+    Returns:
+        OSS文件的完整访问URL
+
+    Raises:
+        Exception: 上传失败时抛出异常
+    """
+    try:
+        # 初始化OSS服务
+        oss_service = OSSStorageService()
+
+        # 构建OSS路径：renders/{unionid}/{task_id}/{frame_number}/{original_filename}
+        original_filename = local_output_path.name
+        oss_path = f"renders/{unionid}/{task_id}/{frame_number}/{original_filename}"
+
+        logger.info(f"开始上传渲染结果到OSS: {local_output_path} -> {oss_path}")
+
+        # 上传文件
+        oss_service.upload_file(
+            local_path=local_output_path,
+            oss_path=oss_path
+        )
+
+        # 构建完整的OSS访问URL
+        oss_full_url = f"https://{settings.oss_bucket_name}.{settings.oss_endpoint}/{oss_path}"
+
+        logger.info(f"渲染结果上传成功: {oss_full_url}")
+        return oss_full_url
+
+    except Exception as e:
+        logger.error(f"上传渲染结果到OSS失败: {str(e)}")
+        raise
 
 
 @celery_app.task(
@@ -130,9 +174,22 @@ def render_task(self, task_id: int):
                 )
                 render_time = time.time() - start_time
 
+                # 上传渲染结果到OSS
+                try:
+                    oss_path = upload_frame_to_oss(
+                        unionid=task.unionid,
+                        task_id=task.id,
+                        frame_number=frame.frame_number,
+                        local_output_path=Path(output_path)
+                    )
+                except Exception as oss_error:
+                    logger.warning(f"上传帧 {frame.frame_number} 到OSS失败: {str(oss_error)}，但渲染已完成")
+                    oss_path = None
+
                 # 更新帧信息
                 frame.status = FrameStatus.COMPLETED
                 frame.output_path = str(output_path)
+                frame.oss_output_path = oss_path
                 frame.render_time = render_time
                 frame.stdout = stdout
                 frame.stderr = stderr
@@ -248,9 +305,22 @@ def retry_render_frame(self, task_id: int, frame_number: int):
         )
         render_time = time.time() - start_time
 
+        # 上传渲染结果到OSS
+        try:
+            oss_path = upload_frame_to_oss(
+                unionid=task.unionid,
+                task_id=task.id,
+                frame_number=frame.frame_number,
+                local_output_path=Path(output_path)
+            )
+        except Exception as oss_error:
+            logger.warning(f"上传帧 {frame.frame_number} 到OSS失败: {str(oss_error)}，但渲染已完成")
+            oss_path = None
+
         # 更新帧信息
         frame.status = FrameStatus.COMPLETED
         frame.output_path = str(output_path)
+        frame.oss_output_path = oss_path
         frame.render_time = render_time
         frame.stdout = stdout
         frame.stderr = stderr

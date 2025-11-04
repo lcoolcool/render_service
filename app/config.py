@@ -20,7 +20,8 @@ class Settings(BaseSettings):
     celery_result_backend: str = "redis://localhost:6379/1"
 
     # 文件存储配置
-    workspace_root_dir: Path = Path("C:/workspace")  # 任务工作空间根目录（包含所有任务的source、project、renders）
+    workspace_root_dir: Path = Path("C:/workspace")  # 任务工作空间根目录
+    renders_dir_name: str = "Renders"  # 渲染输出目录名称（系统统一配置）
 
     # 阿里云OSS配置
     oss_endpoint: str = "oss-cn-hangzhou.aliyuncs.com"  # OSS访问域名

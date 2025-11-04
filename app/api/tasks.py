@@ -221,6 +221,7 @@ async def get_task_frames(
             frame_number=frame.frame_number,
             status=frame.status.value,
             output_path=frame.output_path,
+            oss_output_path=frame.oss_output_path,
             render_time=frame.render_time,
             error_message=frame.error_message,
             created_at=frame.created_at,

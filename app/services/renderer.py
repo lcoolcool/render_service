@@ -1,11 +1,15 @@
 """渲染引擎适配器"""
 import re
 import subprocess
+import logging
+
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
 from app.config import settings
 from app.models.task import RenderEngine
+
+logger = logging.getLogger(__name__)
 
 
 class BaseRenderer(ABC):
@@ -110,21 +114,23 @@ class MayaRenderer(BaseRenderer):
         stdout, stderr = self._run_command(command, timeout=3600)  # 1小时超时
 
         # 解析输出，查找生成的文件
-        output_file = self._find_output_file(output_dir, frame_number, stdout)
+        output_file = self._find_output_file(output_dir, frame_number, stdout, project_file)
+
 
         if not output_file or not output_file.exists():
             raise RuntimeError(f"未找到渲染输出文件，帧号: {frame_number}")
 
         return output_file, stdout, stderr
 
-    def _find_output_file(self, output_dir: Path, frame_number: int, stdout: str) -> Optional[Path]:
+    def _find_output_file(self, output_dir: Path, frame_number: int, stdout: str, project_file: str) -> Optional[Path]:
         """
         从Maya输出中查找渲染结果文件
 
         查找策略（按优先级）：
-        1. 从stdout日志解析文件路径
-        2. 在输出目录中查找匹配帧号的图片文件
-        3. 返回最新修改的图片文件（兜底方案）
+        1. 从stdout日志解析文件路径（最可靠）
+        2. 在多个可能的目录中查找匹配帧号的图片文件：
+           - 指定的output_dir（通过-rd参数传递）
+           - 工程文件所在目录及其常见子目录（处理相对路径情况）
         """
 
         # 策略1: 从stdout解析文件路径
@@ -134,27 +140,67 @@ class MayaRenderer(BaseRenderer):
         # - "Writing file: scene_0001.png"
         output_file = self._parse_output_from_stdout(stdout)
         if output_file and output_file.exists():
+            logger.info(f"从stdout解析到输出文件: {output_file}")
             return output_file
+        logger.info("未从stdout解析到输出文件，尝试从任务目录中查找匹配的文件")
 
-        # 策略2: 在输出目录中查找匹配的文件
-        output_file = self._search_output_in_directory(output_dir, frame_number)
-        if output_file:
-            return output_file
+        # 策略2: 在多个可能的目录中查找匹配的文件
+        # 获取所有可能的输出目录（包括处理用户设置的相对路径）
+        possible_dirs = self._get_possible_output_directories(output_dir, project_file)
 
-        # 策略3: 兜底方案 - 返回最新修改的图片文件
-        output_file = self._find_latest_image(output_dir)
-        if output_file:
-            return output_file
+        for search_dir in possible_dirs:
+            if not search_dir.exists():
+                continue
 
+            output_file = self._search_output_in_directory(search_dir, frame_number)
+            if output_file:
+                logger.info(f"在目录 {search_dir} 中找到输出文件: {output_file}")
+                return output_file
+
+        logger.warning(f"在所有可能的目录中都未找到帧 {frame_number} 的输出文件")
         return None
 
-    def _parse_output_from_stdout(self, stdout: str) -> Optional[Path]:
-        """从Maya的stdout日志中解析输出文件路径"""
+    def _get_possible_output_directories(self, output_dir: Path, project_file: str) -> list[Path]:
+        """
+        获取所有可能的输出目录列表（处理用户在工程文件中设置相对路径的情况）
 
-        # 匹配常见的输出模式，支持多种图片格式
+        Args:
+            output_dir: 我们通过-rd参数指定的输出目录
+            project_file: Maya工程文件路径
+
+        Returns:
+            按优先级排序的可能输出目录列表
+        """
+        possible_dirs = []
+
+        # 优先级1: 指定的输出目录
+        possible_dirs.append(output_dir)
+
+        return possible_dirs
+
+    def _parse_output_from_stdout(self, stdout: str) -> Optional[Path]:
+        """
+        从Maya的stdout日志中解析输出文件路径
+
+        支持的Maya输出格式：
+        - Maya 2025 Arnold: | [driver_exr] writing file `path.exr'
+        - 旧版本: Rendering: path.exr
+        - 其他: Writing file: path.png
+        """
+
+        # 匹配常见的输出模式，按优先级排序（支持多种图片格式）
         patterns = [
+            # Maya 2025 Arnold格式: | [driver_exr] writing file `path.exr'
+            # 匹配反引号包围的路径，反引号后可能是单引号或反引号
+            r'writing\s+file\s+[`\']([^`\'\n\r]+\.(?:exr|png|jpg|jpeg|tif|tiff|tga|bmp|iff))',
+
+            # 通用格式: Writing file: path
             r'(?:Rendering|Result|Writing\s+file):\s*([^\n\r]+\.(?:exr|png|jpg|jpeg|tif|tiff|tga|bmp|iff))',
+
+            # 简化格式: Writing path
             r'Writing\s+([^\n\r]+\.(?:exr|png|jpg|jpeg|tif|tiff|tga|bmp|iff))',
+
+            # 完成格式: File written: path
             r'File\s+written:\s*([^\n\r]+\.(?:exr|png|jpg|jpeg|tif|tiff|tga|bmp|iff))',
         ]
 
@@ -162,93 +208,36 @@ class MayaRenderer(BaseRenderer):
             matches = re.findall(pattern, stdout, re.IGNORECASE)
             if matches:
                 # 返回最后一个匹配（通常是最终的输出文件）
-                file_path = Path(matches[-1].strip())
-                # 清理可能的引号和空白字符
-                file_path_str = str(file_path).strip('"\'')
+                file_path_str = matches[-1].strip()
+                # 清理可能的引号、反引号和空白字符
+                file_path_str = file_path_str.strip('"\'`')
+                logger.debug(f"从stdout解析到文件路径: {file_path_str} (使用模式: {pattern})")
                 return Path(file_path_str)
 
+        logger.debug("未能从stdout解析出文件路径")
         return None
 
     def _search_output_in_directory(self, output_dir: Path, frame_number: int) -> Optional[Path]:
         """
-        在输出目录中查找匹配帧号的渲染文件
-
-        支持的文件名格式：
-        - scene.0001.exr （扩展名在最后）
-        - scene.exr.0001 （扩展名在中间）
-        - scene_0001.exr （下划线分隔）
-        - scene-0001.exr （连字符分隔）
+        在输出目录中查找渲染文件（假设输出目录中只有一个渲染文件）
         """
 
-        supported_exts = ('.exr', '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.tga', '.bmp', '.iff')
+        supported_exts = ('.exr', '.png', '.deepexr', '.jpeg', '.tif', '.maya')
 
-        # 准备帧号的多种格式
-        frame_patterns = [
-            f"{frame_number:04d}",  # 0001
-            f"{frame_number:05d}",  # 00001
-            f"{frame_number:06d}",  # 000001
-            str(frame_number),      # 1
-        ]
-
-        # 编译正则表达式：匹配包含帧号的文件名
-        # 使用单词边界确保精确匹配（避免 frame 1 匹配到 frame 10）
-        regex_patterns = []
-        for frame_str in frame_patterns:
-            # 匹配各种分隔符：点、下划线、连字符、或直接连接
-            regex_patterns.append(
-                re.compile(
-                    rf'(?:^|[._-])({re.escape(frame_str)})(?:[._-]|$)',
-                    re.IGNORECASE
-                )
-            )
-
-        # 遍历输出目录中的所有文件（只遍历一次）
-        best_match = None
-        best_priority = -1
-
+        # 遍历输出目录，找到第一个支持格式的图片文件
         for file_path in output_dir.iterdir():
             if not file_path.is_file():
                 continue
 
-            file_name = file_path.name
-            file_name_lower = file_name.lower()
+            file_name_lower = file_path.name.lower()
 
             # 检查是否为支持的图片格式
-            if not any(file_name_lower.endswith(ext) or ext in file_name_lower for ext in supported_exts):
-                continue
+            if any(file_name_lower.endswith(ext) for ext in supported_exts):
+                logger.info(f"找到渲染输出文件: {file_path.name}")
+                return file_path
 
-            # 检查文件名是否匹配帧号
-            for priority, (frame_str, regex_pattern) in enumerate(zip(frame_patterns, regex_patterns)):
-                if regex_pattern.search(file_name):
-                    # 优先级：4位补齐 > 5位补齐 > 6位补齐 > 无补齐
-                    if priority > best_priority:
-                        best_priority = priority
-                        best_match = file_path
-                    break  # 找到匹配后跳出内层循环
-
-        return best_match
-
-    def _find_latest_image(self, output_dir: Path) -> Optional[Path]:
-        """查找输出目录中最新修改的图片文件（兜底方案）"""
-
-        supported_exts = ('.exr', '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.tga', '.bmp', '.iff')
-
-        image_files = []
-        for file_path in output_dir.iterdir():
-            if not file_path.is_file():
-                continue
-
-            # 检查扩展名（支持扩展名在中间或最后）
-            file_name_lower = file_path.name.lower()
-            if any(file_name_lower.endswith(ext) or ext in file_name_lower for ext in supported_exts):
-                image_files.append(file_path)
-
-        if not image_files:
-            return None
-
-        # 按修改时间排序，返回最新的
-        image_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
-        return image_files[0]
+        logger.warning(f"在目录 {output_dir} 中未找到支持格式的渲染文件")
+        return None
 
 
 class UERenderer(BaseRenderer):

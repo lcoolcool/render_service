@@ -35,10 +35,8 @@ class FilePreparationService:
         - 如果提供了file_path（本地文件），直接使用本地文件
         - 如果提供了oss_file_path（OSS文件），则：
           1. 创建任务隔离的工作空间目录
-          2. 从OSS下载文件到 source/ 目录（可从task_info自定义）
-          3. 如果是压缩文件，解压到 project/ 目录（可从task_info自定义）
           4. 查找工程文件路径
-          5. 返回工程文件路径、工作空间路径和渲染输出目录（可从task_info自定义）
+          5. 返回工程文件路径、工作空间路径和渲染输出目录（系统统一配置）
 
         Args:
             unionid: 用户ID（用于目录隔离）
@@ -47,10 +45,7 @@ class FilePreparationService:
             file_path: 本地文件路径（可选）
             is_compressed: 是否为压缩文件
             render_engine: 渲染引擎类型（用于确定工程文件扩展名）
-            task_info: 任务配置信息，可包含：
-                - source_dir: 源文件目录名（默认: "source"）
-                - project_dir: 工程文件目录名（默认: "project"）
-                - renders_dir: 渲染输出目录名（默认: "Sys_Default_Renders"）
+            task_info: 任务配置信息（用于渲染引擎特定参数）
 
         Returns:
             (工程文件路径, 工作空间目录路径, 渲染输出目录)
@@ -84,8 +79,8 @@ class FilePreparationService:
 
         流程:
         1. 创建任务隔离的工作空间目录
-        2. 如果是压缩文件，复制到source目录并解压到project目录
-        3. 如果不是压缩文件，复制到project目录
+        2. 如果是压缩文件，复制到工作空间目录并解压到工作空间目录
+        3. 如果不是压缩文件，复制到工作空间目录
         4. 查找工程文件路径
         5. 返回工程文件路径、工作空间路径和渲染输出目录
 
@@ -110,56 +105,48 @@ class FilePreparationService:
             if not local_file.exists():
                 raise FileNotFoundError(f"本地文件不存在: {file_path}")
 
-            # 1. 创建工作空间目录结构（从task_info读取路径配置，如果没有则使用默认值）
-            workspace_dir = self._create_workspace(unionid, task_id)
-            source_dir_name = task_info.get("source_dir", "source")
-            project_dir_name = task_info.get("project_dir", "project")
-            renders_dir_name = task_info.get("renders_dir", "Sys_Default_Renders")
+            # 1. 创建任务工作空间目录结构（使用系统配置的固定目录名）
+            task_workspace_dir = self._create_task_workspace(unionid, task_id)
+            renders_dir_name = settings.renders_dir_name
 
-            source_dir = workspace_dir / source_dir_name
-            project_dir = workspace_dir / project_dir_name
-            renders_dir = workspace_dir / renders_dir_name
-
-            source_dir.mkdir(parents=True, exist_ok=True)
-            project_dir.mkdir(parents=True, exist_ok=True)
+            renders_dir = task_workspace_dir / renders_dir_name
             renders_dir.mkdir(parents=True, exist_ok=True)
 
-            logger.info(f"创建工作空间: {workspace_dir}")
+            logger.info(f"创建任务工作目录: {task_workspace_dir}")
             logger.info(f"使用本地文件: {file_path}")
 
             # 2. 处理压缩文件
             if is_compressed:
-                # 复制到source目录
-                copied_file = source_dir / local_file.name
+                copied_file = task_workspace_dir / local_file.name
                 shutil.copy2(str(local_file), str(copied_file))
-                logger.info(f"文件为压缩格式，已复制到source目录，开始解压...")
+                logger.info(f"文件为压缩格式，已复制到任务工作目录，开始解压...")
 
                 # 解压到project目录
                 self.file_handler.decompress_file(
-                    compressed_file=copied_file,
-                    output_dir=project_dir,
+                    compressed_file=local_file,
+                    output_dir=task_workspace_dir,
                     delete_after=False  # 保留原压缩文件
                 )
             else:
                 # 非压缩文件，直接复制到project目录
                 logger.info(f"文件无需解压，直接复制")
-                shutil.copy2(str(local_file), str(project_dir / local_file.name))
+                shutil.copy2(str(local_file), str(task_workspace_dir / local_file.name))
 
             # 3. 查找工程文件
-            project_file = self._find_project_file(project_dir, render_engine)
+            project_file = self._find_project_file(task_workspace_dir, render_engine)
             if not project_file:
                 raise FileNotFoundError(
-                    f"在 {project_dir} 中未找到有效的工程文件"
+                    f"在 {task_workspace_dir} 中未找到有效的工程文件"
                 )
 
             logger.info(f"文件准备完成: {project_file}")
-            return project_file, workspace_dir, renders_dir
+            return project_file, task_workspace_dir, renders_dir
 
         except Exception as e:
             logger.error(f"本地文件准备失败: {e}")
             # 清理失败的工作空间
             if 'workspace_dir' in locals():
-                self.cleanup_workspace(workspace_dir)
+                self.cleanup_workspace(task_workspace_dir)
             raise
 
     def _prepare_oss_file(
@@ -172,12 +159,12 @@ class FilePreparationService:
         task_info: dict
     ) -> Tuple[Path, Path, Path]:
         """
-        准备OSS文件（原有逻辑）
+        准备OSS文件（仿照本地文件准备流程）
 
         流程:
         1. 创建任务隔离的工作空间目录
-        2. 从OSS下载文件到 source/ 目录
-        3. 如果是压缩文件，解压到 project/ 目录
+        2. 从OSS下载文件到工作空间目录
+        3. 如果是压缩文件，解压到工作空间目录
         4. 查找工程文件路径
         5. 返回工程文件路径、工作空间路径和渲染输出目录
 
@@ -197,25 +184,18 @@ class FilePreparationService:
             ValueError: 解压失败或不支持的格式
         """
         try:
-            # 1. 创建工作空间目录结构（从task_info读取路径配置，如果没有则使用默认值）
-            workspace_dir = self._create_workspace(unionid, task_id)
-            source_dir_name = task_info.get("source_dir", "source")
-            project_dir_name = task_info.get("project_dir", "project")
-            renders_dir_name = task_info.get("renders_dir", "Sys_Default_Renders")
+            # 1. 创建任务工作空间目录结构（使用系统配置的固定目录名）
+            task_workspace_dir = self._create_task_workspace(unionid, task_id)
+            renders_dir_name = settings.renders_dir_name or "Renders"
 
-            source_dir = workspace_dir / source_dir_name
-            project_dir = workspace_dir / project_dir_name
-            renders_dir = workspace_dir / renders_dir_name
-
-            source_dir.mkdir(parents=True, exist_ok=True)
-            project_dir.mkdir(parents=True, exist_ok=True)
+            renders_dir = task_workspace_dir / renders_dir_name
             renders_dir.mkdir(parents=True, exist_ok=True)
 
-            logger.info(f"创建工作空间: {workspace_dir}")
+            logger.info(f"创建任务工作目录: {task_workspace_dir}")
 
-            # 2. 从OSS下载文件
+            # 2. 从OSS下载文件到工作空间目录
             filename = Path(oss_file_path).name
-            downloaded_file = source_dir / filename
+            downloaded_file = task_workspace_dir / filename
 
             logger.info(f"从OSS下载文件: {oss_file_path}")
             self.oss_service.download_file(
@@ -226,34 +206,34 @@ class FilePreparationService:
             # 3. 处理压缩文件
             if is_compressed:
                 logger.info(f"文件为压缩格式，开始解压...")
+                # 解压到工作空间目录
                 self.file_handler.decompress_file(
                     compressed_file=downloaded_file,
-                    output_dir=project_dir,
-                    delete_after=True  # 解压后删除原压缩文件以节省空间
+                    output_dir=task_workspace_dir,
+                    delete_after=False
                 )
             else:
-                # 非压缩文件，直接移动到project目录
+                # 非压缩文件，已经在工作空间目录中，无需移动
                 logger.info(f"文件无需解压，直接使用")
-                shutil.move(str(downloaded_file), str(project_dir / filename))
 
             # 4. 查找工程文件
-            project_file = self._find_project_file(project_dir, render_engine)
+            project_file = self._find_project_file(task_workspace_dir, render_engine)
             if not project_file:
                 raise FileNotFoundError(
-                    f"在 {project_dir} 中未找到有效的工程文件"
+                    f"在 {task_workspace_dir} 中未找到有效的工程文件"
                 )
 
             logger.info(f"文件准备完成: {project_file}")
-            return project_file, workspace_dir, renders_dir
+            return project_file, task_workspace_dir, renders_dir
 
         except Exception as e:
-            logger.error(f"文件准备失败: {e}")
+            logger.error(f"OSS文件准备失败: {e}")
             # 清理失败的工作空间
-            if 'workspace_dir' in locals():
-                self.cleanup_workspace(workspace_dir)
+            if 'task_workspace_dir' in locals():
+                self.cleanup_workspace(task_workspace_dir)
             raise
 
-    def _create_workspace(self, unionid: str, task_id: int) -> Path:
+    def _create_task_workspace(self, unionid: str, task_id: int) -> Path:
         """
         创建任务工作空间目录
 
@@ -261,9 +241,6 @@ class FilePreparationService:
         workspace_root/
           └── {unionid}/
               └── {task_id}/
-                  ├── source/       # OSS下载的原始文件
-                  ├── project/      # 解压后的工程文件
-                  └── renders/      # 渲染输出文件
 
         Args:
             unionid: 用户ID
